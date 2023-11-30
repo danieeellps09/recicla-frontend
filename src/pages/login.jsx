@@ -135,7 +135,7 @@ function Login() {
                             <Row className="d-flex justify-content-between">
                                 <Col className='d-flex'>
                                     <input type="checkbox" className="form-check-input custom-focus" id="save-login" />
-                                    <label className="form-check-label ml-1" htmlFor="save-login">Salvarlogin</label>
+                                    <label className="form-check-label ml-1" htmlFor="save-login">Salvar login</label>
                                 </Col>
                                 <Col className="d-flex justify-content-end">
                                     <a className='text-orange' href="#" onClick={handleOpenModal}>Esqueceu a senha?</a>

@@ -1,0 +1,123 @@
+.login-navbar {
+  background: linear-gradient(to bottom, #EF7A2A, #E1621E)!important;
+}
+
+body {
+  background-image: url('../images/backgroundlogin.png')!important;
+  background-size: cover!important;
+  background-position: center!important;
+  background-attachment: fixed!important;
+}
+
+body .outline-orange {
+  color: white!important;
+  background-color: transparent!important;
+  border-color: white!important;
+}
+
+body .outline-orange:hover {
+  color: #EF7A2A!important;
+  border-color: white!important;
+  background-color: white!important;
+}
+
+body .outline-orange:active {
+color: white!important;
+border-color: #E1621E!important;
+background-color: #E1621E!important;
+}
+
+body .outline-white {
+color: #EF7A2A!important;
+background-color: transparent!important;
+border-color: #EF7A2A!important;
+}
+
+body .outline-white:hover {
+color: white!important;
+border-color: #EF7A2A!important;
+background-color: #EF7A2A!important;
+}
+body .outline-white:active {
+color: white!important;
+border-color: #EF7A2A!important;
+background-color: #EF7A2A!important;
+}
+
+body .outline-white:active {
+color: white!important;
+border-color: #E1621E!important;
+background-color: #E1621E!important;
+}
+
+body .btn-orange {
+  background-color: #EF7A2A!important;
+  color: #ffffff!important;
+  border-color: transparent!important;
+}
+
+body .btn-orange:hover[type="submit"] {
+background-color: #E1621E!important;
+color: #ffffff!important;
+border-color: #EF7A2A!important;
+}
+
+body .btn-orange:active {
+color: white!important;
+border-color: #E1621E!important;
+background-color: #E1621E!important;
+}
+
+body .custom-focus:focus {
+  border-color: #E1621E!important;
+  box-shadow: 0 0 0 0.2rem #ff725e50!important;
+}
+
+
+label , .form-check-label, input {
+  margin-left: 0.5rem!important;
+}
+
+.text-orange {
+  color: #EF7A2A!important;
+}
+
+.border-orange {
+border-color: #EF7A2A!important;
+border-radius: 50px!important;
+
+}
+
+.custom-focus:checked {
+background-color: #E1621E!important;
+border-color: #EF7A2A!important         ;
+}
+
+.buttonindex{
+margin: 0.5rem!important;
+border-radius: 2rem!important;
+padding: 0.8rem!important;
+font-size: 1.5rem!important;
+
+}
+
+.title{
+font-size: 4rem!important;
+}
+
+
+.pagination .page-item.active .page-link {
+background-color: #E1621E!important;
+border-color: #E1621E!important; 
+color: #fff!important;
+}
+
+.pagination .page-item .page-link {
+background-color: white!important; /* Cor de fundo para as páginas não ativas */
+border-color: #EF7A2A!important; /* Cor da borda para as páginas não ativas, se necessário */
+color: #EF7A2A!important; /* Cor do texto para as páginas não ativas */
+}
+
+.pagination .page-item .page-link:focus {
+box-shadow: 0 0 0 0.2rem #ff725e50!important;
+}

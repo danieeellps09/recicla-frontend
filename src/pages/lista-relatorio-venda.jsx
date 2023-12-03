@@ -28,7 +28,7 @@ function ListaRelatorioVendaAssociacao() {
   const fetchAssociacoes = async () => {
     try {
       const response = await axios.get(
-        "http://3.129.19.7:3000/api/v1/associacoes", config
+        "https://18.189.110.174/api/v1/associacoes", config
       );
       setAssociacoes(response.data);
     } catch (error) {
@@ -106,7 +106,7 @@ function ListaRelatorioVendaAssociacao() {
   const handleClick = async () => {
     try {
       const response = await axios.get(
-        `http://3.129.19.7:3000/api/v1/forms/venda/findBetweenDates/${selectedAssociacao}`,
+        `https://18.189.110.174/api/v1/forms/venda/findBetweenDates/${selectedAssociacao}`,
         {
           params,
           headers: {
@@ -136,7 +136,7 @@ function ListaRelatorioVendaAssociacao() {
   const handleDownloadPDF = async () => {
     try {
       const response = await axios.get(
-        `http://3.129.19.7:3000/api/v1/pdf/venda/${selectedAssociacao}`,  // Supondo que você deseja usar o ID da primeira venda
+        `https://18.189.110.174/api/v1/pdf/venda/${selectedAssociacao}`,  // Supondo que você deseja usar o ID da primeira venda
         {
           params: {
             completo: true,

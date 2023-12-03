@@ -80,7 +80,7 @@ console.log('Parâmetros da Requisição:', params);
   const handleClick = async () => {
     try {
       const response = await axios.get(
-        'http://3.129.19.7:3000/api/v1/forms/coleta/encontrar-entre-datas/by-catador',
+        'https://18.189.110.174/api/v1/forms/coleta/encontrar-entre-datas/by-catador',
         {
             params,
             headers: {
@@ -107,7 +107,7 @@ console.log('Parâmetros da Requisição:', params);
   const handleDownloadPDF = async () => {
     try {
       const response = await axios.get(
-        `http://3.129.19.7:3000/api/v1/pdf/coleta-catador`,  // Supondo que você deseja usar o ID da primeira venda
+        `https://18.189.110.174/api/v1/pdf/coleta-catador`,  // Supondo que você deseja usar o ID da primeira venda
         {
           params: {
             completo: true,

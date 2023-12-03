@@ -28,7 +28,7 @@ function ListaRelatorioColeta() {
   const fetchCatadores = async () => {
     try {
       const response = await axios.get(
-        "http://3.129.19.7:3000/api/v1/catadores",config
+        "https://18.189.110.174/api/v1/catadores",config
       );
       setCatadores(response.data);
       
@@ -103,7 +103,7 @@ function ListaRelatorioColeta() {
     try {
       console.log(`${selectedCatador}`)
       const response = await axios.get(
-        `http://3.129.19.7:3000/api/v1/forms/coleta/findBetweenDates/${selectedCatador}`,
+        `https://18.189.110.174/api/v1/forms/coleta/findBetweenDates/${selectedCatador}`,
         {
           params,
           headers: {
@@ -128,7 +128,7 @@ function ListaRelatorioColeta() {
   const handleDownloadPDF = async () => {
     try {
       const response = await axios.get(
-        `http://3.129.19.7:3000/api/v1/pdf/coleta/${selectedCatador}`,  // Supondo que você deseja usar o ID da primeira venda
+        `https://18.189.110.174/api/v1/pdf/coleta/${selectedCatador}`,  // Supondo que você deseja usar o ID da primeira venda
         {
           params: {
             completo: true,

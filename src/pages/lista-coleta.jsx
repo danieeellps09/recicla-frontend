@@ -61,7 +61,7 @@ const AdicionarColeta = (props) => {
             }
         };
 
-        fetchData('http://3.129.19.7:3000/api/v1/veiculos', setVeiculos);
+        fetchData('https://18.189.110.174/api/v1/veiculos', setVeiculos);
     }, []);
 
 
@@ -108,7 +108,7 @@ const AdicionarColeta = (props) => {
             }
         };
 
-        axios.post('http://3.129.19.7:3000/api/v1/forms/coleta', dataToSend, config)
+        axios.post('https://18.189.110.174/api/v1/forms/coleta', dataToSend, config)
             .then(response => {
 
 
@@ -288,7 +288,7 @@ const Visualizar = (props) => {
                 console.error('Erro ao obter dados:', error);
             }
         };
-        fetchData(`http://3.129.19.7:3000/api/v1/forms/coleta/${props.idColeta}`, setColeta);
+        fetchData(`https://18.189.110.174/api/v1/forms/coleta/${props.idColeta}`, setColeta);
         console.log(props.idColeta)
 
     }, [props.idColeta]);
@@ -296,7 +296,7 @@ const Visualizar = (props) => {
 
     const fetchCatadorName = async (idCatador) => {
         try {
-            const response = await axios.get(`http://3.129.19.7:3000/api/v1/catadores/${idCatador}`);
+            const response = await axios.get(`https://18.189.110.174/api/v1/catadores/${idCatador}`);
             setNome(response.data.user.name);
         } catch (error) {
             console.error('Erro ao obter o nome do catador:', error);
@@ -305,7 +305,7 @@ const Visualizar = (props) => {
 
     const fetchVeiculoName = async (idVeiculo) => {
         try {
-            const response = await axios.get(`http://3.129.19.7:3000/api/v1/veiculos/${idVeiculo}`);
+            const response = await axios.get(`https://18.189.110.174/api/v1/veiculos/${idVeiculo}`);
             setVeiculos(response.data.nomeVeiculo);
         } catch (error) {
             console.error('Erro ao obter o nome do catador:', error);
@@ -450,7 +450,7 @@ function ListarColetasCatador() {
     useEffect(() => {
         axios
             .get(
-                "http://3.129.19.7:3000/api/v1/forms/coleta",
+                "https://18.189.110.174/api/v1/forms/coleta",
                 config
             )
             .then((response) => {

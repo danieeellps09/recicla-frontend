@@ -44,7 +44,7 @@ const AdicionarAdministrador = (props) => {
         };
         console.log(dataToSend)
 
-        axios.post('http://3.129.19.7:3000/api/v1/administrador', dataToSend)
+        axios.post('https://18.189.110.174/api/v1/administrador', dataToSend)
             .then(response => {
 
 
@@ -170,7 +170,7 @@ function EditarAdministrador(props) {
                 console.error('Erro ao obter dados:', error);
             }
         };
-        fetchData(`http://3.129.19.7:3000/api/v1/administrador/${props.administradorId}`, setAdministrador);
+        fetchData(`https://18.189.110.174/api/v1/administrador/${props.administradorId}`, setAdministrador);
        
     }, [props.administradorId]);
 
@@ -188,7 +188,7 @@ function EditarAdministrador(props) {
         };
         console.log(dataToSend)
         console.log(props.administradorId)
-        axios.put(`http://3.129.19.7:3000/api/v1/administrador/${props.administradorId}`, dataToSend)
+        axios.put(`https://18.189.110.174/api/v1/administrador/${props.administradorId}`, dataToSend)
             .then(response => {
                 if (response && response.data) {
                     console.log('Administrador atualizado com sucesso:', response.data);
@@ -304,7 +304,7 @@ function ListarAdministradores() {
 
     const handleExcluirAdministrador = (administradorId) => {
     
-            axios.delete(`http://3.129.19.7:3000/api/v1/administrador/${administradorId}`)
+            axios.delete(`https://18.189.110.174/api/v1/administrador/${administradorId}`)
                 .then(response => {
                     if (response && response.status === 200) {
                         toast.success('Administrador excluído com sucesso!');
@@ -390,7 +390,7 @@ function ListarAdministradores() {
     };
 
     useEffect(() => {
-        axios.get('http://3.129.19.7:3000/api/v1/administrador', config)
+        axios.get('https://18.189.110.174/api/v1/administrador', config)
             .then(response => {
                 setAdministradorData(response.data);
 

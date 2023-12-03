@@ -45,10 +45,10 @@ const AdicionarCatador = (props) => {
             }
         };
 
-        fetchData('http://3.129.19.7:3000/api/v1/associacoes', setAssociacoes);
-        fetchData('http://3.129.19.7:3000/api/v1/etnia', setEtnias);
-        fetchData('http://3.129.19.7:3000/api/v1/genero', setGeneros);
-        fetchData('http://3.129.19.7:3000/api/v1/funcoes-catador', setFuncoes);
+        fetchData('https://18.189.110.174/api/v1/associacoes', setAssociacoes);
+        fetchData('https://18.189.110.174/api/v1/etnia', setEtnias);
+        fetchData('https://18.189.110.174/api/v1/genero', setGeneros);
+        fetchData('https://18.189.110.174/api/v1/funcoes-catador', setFuncoes);
 
     }, []);
 
@@ -94,7 +94,7 @@ const AdicionarCatador = (props) => {
         };
         console.log(dataToSend)
 
-        axios.post('http://3.129.19.7:3000/api/v1/catadores', dataToSend)
+        axios.post('https://18.189.110.174/api/v1/catadores', dataToSend)
             .then(response => {
 
 
@@ -348,11 +348,11 @@ function EditarCatador(props) {
                 console.error('Erro ao obter dados:', error);
             }
         };
-        fetchData(`http://3.129.19.7:3000/api/v1/catadores/${props.catadorId}`, setCatador);
-        fetchData('http://3.129.19.7:3000/api/v1/associacoes', setAssociacoes);
-        fetchData('http://3.129.19.7:3000/api/v1/etnia', setEtnias);
-        fetchData('http://3.129.19.7:3000/api/v1/genero', setGeneros);
-        fetchData('http://3.129.19.7:3000/api/v1/funcoes-catador', setFuncoes);
+        fetchData(`https://18.189.110.174/api/v1/catadores/${props.catadorId}`, setCatador);
+        fetchData('https://18.189.110.174/api/v1/associacoes', setAssociacoes);
+        fetchData('https://18.189.110.174/api/v1/etnia', setEtnias);
+        fetchData('https://18.189.110.174/api/v1/genero', setGeneros);
+        fetchData('https://18.189.110.174/api/v1/funcoes-catador', setFuncoes);
 
     }, [props.catadorId]);
 
@@ -399,7 +399,7 @@ function EditarCatador(props) {
         };
         console.log(dataToSend)
         console.log(props.catadorId)
-        axios.put(`http://3.129.19.7:3000/api/v1/catadores/${props.catadorId}`, dataToSend)
+        axios.put(`https://18.189.110.174/api/v1/catadores/${props.catadorId}`, dataToSend)
             .then(response => {
                 if (response && response.data) {
                     console.log('Catador atualizado com sucesso:', response.data);
@@ -595,7 +595,7 @@ function ListarCatadores() {
 
     const handleExcluirCatador = (catadorId) => {
 
-        axios.delete(`http://3.129.19.7:3000/api/v1/catadores/${catadorId}`)
+        axios.delete(`https://18.189.110.174/api/v1/catadores/${catadorId}`)
             .then(response => {
                 if (response && response.status === 200) {
                     toast.success('Catador excluído com sucesso!');
@@ -689,7 +689,7 @@ function ListarCatadores() {
 
     useEffect(() => {
         // Fazendo a chamada para o backend para obter os dados do catador
-        axios.get('http://3.129.19.7:3000/api/v1/catadores/pega-catadores/associacao', config)
+        axios.get('https://18.189.110.174/api/v1/catadores/pega-catadores/associacao', config)
             .then(response => {
                 setCatadorData(response.data);
 

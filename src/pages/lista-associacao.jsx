@@ -60,7 +60,7 @@ const AdicionarAssociacao = (props) => {
         };
         console.log(dataToSend)
 
-        axios.post('http://3.129.19.7:3000/api/v1/associacoes', dataToSend)
+        axios.post('https://18.189.110.174/api/v1/associacoes', dataToSend)
             .then(response => {
 
 
@@ -208,7 +208,7 @@ function EditarAssociacao(props) {
                 console.error('Erro ao obter dados:', error);
             }
         };
-        fetchData(`http://3.129.19.7:3000/api/v1/associacoes/${props.associacaoId}`, setAssociacao);
+        fetchData(`https://18.189.110.174/api/v1/associacoes/${props.associacaoId}`, setAssociacao);
 
     }, [props.associacaoId]);
 
@@ -229,7 +229,7 @@ function EditarAssociacao(props) {
         };
         console.log(dataToSend)
         console.log(props.associacaoId)
-        axios.put(`http://3.129.19.7:3000/api/v1/associacoes/${props.associacaoId}`, dataToSend)
+        axios.put(`https://18.189.110.174/api/v1/associacoes/${props.associacaoId}`, dataToSend)
             .then(response => {
                 if (response && response.data) {
                     console.log('Associacao atualizado com sucesso:', response.data);
@@ -364,7 +364,7 @@ function ListarAssociacoes() {
 
     const handleExcluirAssociacao = (associacaoId) => {
     
-            axios.delete(`http://3.129.19.7:3000/api/v1/associacoes/${associacaoId}`)
+            axios.delete(`https://18.189.110.174/api/v1/associacoes/${associacaoId}`)
                 .then(response => {
                     if (response && response.status === 200) {
                         toast.success('Associacao excluída com sucesso!');
@@ -451,7 +451,7 @@ function ListarAssociacoes() {
     };
 
     useEffect(() => {
-        axios.get('http://3.129.19.7:3000/api/v1/associacoes', config)
+        axios.get('https://18.189.110.174/api/v1/associacoes', config)
             .then(response => {
                 setAssociacaoData(response.data);
 

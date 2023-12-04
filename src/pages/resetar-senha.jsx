@@ -28,7 +28,7 @@ function RedefinirSenha() {
     if (password === confirmPassword) {
       try {
         const response = await axios.post(
-          `https://18.189.110.174/resetar-senha/${token}`,
+          `http://3.129.19.7:3000/resetar-senha/${token}`,
           { password: password }
         );
 

@@ -55,7 +55,7 @@ function RelatorioColeta() {
   };
   const fetchCatadorName = async (idCatador) => {
     try {
-      const response = await axios.get(`https://18.189.110.174/api/v1/catadores/${idCatador}`, config);
+      const response = await axios.get(`http://3.129.19.7:3000/api/v1/catadores/${idCatador}`, config);
       setCatadorName(response.data.user.name);
       setFuncaoName(response.data.funcoescatador.funcao)
     } catch (error) {
@@ -65,7 +65,7 @@ function RelatorioColeta() {
 
   const fetchAssociacaoName = async (idAssociacao) => {
     try {
-      const response = await axios.get(`https://18.189.110.174/api/v1/associacoes/${idAssociacao}`, config);
+      const response = await axios.get(`http://3.129.19.7:3000/api/v1/associacoes/${idAssociacao}`, config);
       setAssociacaoName(response.data.user.name);
     } catch (error) {
       console.error('Erro ao obter nome do associacao:', error);
@@ -73,7 +73,7 @@ function RelatorioColeta() {
   };
   const fetchVeiculoInfo = async (veiculoId) => {
     try {
-      const response = await axios.get(`https://18.189.110.174/api/v1/veiculos/${veiculoId}`);
+      const response = await axios.get(`http://3.129.19.7:3000/api/v1/veiculos/${veiculoId}`);
       const veiculo = response.data.nomeVeiculo;
       setVeiculosUtilizados((prevVeiculos) => prevVeiculos.includes(veiculo) ? prevVeiculos : [...prevVeiculos, veiculo]);
     } catch (error) {
@@ -148,7 +148,7 @@ function RelatorioColeta() {
   const handleDownloadPDF = async () => {
     try {
   
-       const downloadURL = `https://18.189.110.174/api/v1/pdf/coleta/${idCatador}?completo=${completo}&datainicio=${formatarData(dataInicialParam)}&datafim=${formatarData(dataFinalParam)}`;
+       const downloadURL = `http://3.129.19.7:3000/api/v1/pdf/coleta/${idCatador}?completo=${completo}&datainicio=${formatarData(dataInicialParam)}&datafim=${formatarData(dataFinalParam)}`;
   
        window.open(downloadURL, '_blank');
     } catch (error) {

@@ -1,4 +1,4 @@
-import { Badge, Button, Col, Container, FormControl, InputGroup, ListGroup, Pagination, Row, Modal, Form, FormLabel, Dropdown } from 'react-bootstrap';
+import { Badge, Button, Col, Container, FormControl, InputGroup, ListGroup, Pagination, Row, Modal, Form, FormLabel, Dropdown, FormGroup } from 'react-bootstrap';
 import InputMask from 'react-input-mask';
 import { BsFilePlus, BsPen, BsPeopleFill, BsPlusCircleFill, BsSearch, BsTrash } from 'react-icons/bs';
 import '../style/css.css';
@@ -45,10 +45,10 @@ const AdicionarCatador = (props) => {
             }
         };
 
-        fetchData('https://18.189.110.174/api/v1/associacoes', setAssociacoes);
-        fetchData('https://18.189.110.174/api/v1/etnia', setEtnias);
-        fetchData('https://18.189.110.174/api/v1/genero', setGeneros);
-        fetchData('https://18.189.110.174/api/v1/funcoes-catador', setFuncoes);
+        fetchData('http://3.129.19.7:3000/api/v1/associacoes', setAssociacoes);
+        fetchData('http://3.129.19.7:3000/api/v1/etnia', setEtnias);
+        fetchData('http://3.129.19.7:3000/api/v1/genero', setGeneros);
+        fetchData('http://3.129.19.7:3000/api/v1/funcoes-catador', setFuncoes);
 
     }, []);
 
@@ -94,7 +94,7 @@ const AdicionarCatador = (props) => {
         };
         console.log(dataToSend)
 
-        axios.post('https://18.189.110.174/api/v1/catadores', dataToSend)
+        axios.post('http://3.129.19.7:3000/api/v1/catadores', dataToSend)
             .then(response => {
 
 
@@ -207,21 +207,25 @@ const AdicionarCatador = (props) => {
                         onChange={(e) => setEndereco(e.target.value)}
                     />
 
-                    <Form.Label className='text-orange'>
-                        Associação
-                    </Form.Label>
-                    <Dropdown className='w-100'>
-                        <Dropdown.Toggle className='w-100 outline-white' id="dropdown-basic">
-                            {visualSelectedAssociacao || 'Selecione uma Associação'}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu className='w-100'>
-                            {associacoes.map((associacao, index) => (
-                                <Dropdown.Item key={index} onClick={handleAssociacaoChange}>
-                                    {associacao.user.name}
-                                </Dropdown.Item>
+
+                    {/* Adicione este código dentro do componente Modal.Body */}
+                    <FormGroup controlId="associacaoDropdown">
+                        <Form.Label className='text-orange'>
+                            Selecione a Associação
+                        </Form.Label>
+                        <Form.Control
+                            as="select"
+                            value={selectedAssociacao}
+                            onChange={(e) => setSelectedAssociacao(e.target.value)}
+                        >
+                            <option value="">Selecione uma associação</option>
+                            {associacoes.map((associacao) => (
+                                <option key={associacao.id} value={associacao.id}>
+                                    {associacao.name}
+                                </option>
                             ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
+                        </Form.Control>
+                    </FormGroup>
 
                     <Form.Label className='text-orange'>
                         Etnia
@@ -348,11 +352,11 @@ function EditarCatador(props) {
                 console.error('Erro ao obter dados:', error);
             }
         };
-        fetchData(`https://18.189.110.174/api/v1/catadores/${props.catadorId}`, setCatador);
-        fetchData('https://18.189.110.174/api/v1/associacoes', setAssociacoes);
-        fetchData('https://18.189.110.174/api/v1/etnia', setEtnias);
-        fetchData('https://18.189.110.174/api/v1/genero', setGeneros);
-        fetchData('https://18.189.110.174/api/v1/funcoes-catador', setFuncoes);
+        fetchData(`http://3.129.19.7:3000/api/v1/catadores/${props.catadorId}`, setCatador);
+        fetchData('http://3.129.19.7:3000/api/v1/associacoes', setAssociacoes);
+        fetchData('http://3.129.19.7:3000/api/v1/etnia', setEtnias);
+        fetchData('http://3.129.19.7:3000/api/v1/genero', setGeneros);
+        fetchData('http://3.129.19.7:3000/api/v1/funcoes-catador', setFuncoes);
 
     }, [props.catadorId]);
 
@@ -372,7 +376,7 @@ function EditarCatador(props) {
         const genero = generos.find(g => g.nomenclatura === event.target.innerText);
         setSelectedGenero(genero ? genero.id : '');
         setSelectedGeneroName(genero ? genero.nomenclatura : '');
-    };  
+    };
 
     const handleFuncaoChange = (event) => {
         const funcao = funcoes.find(f => f.funcao === event.target.innerText);
@@ -399,7 +403,7 @@ function EditarCatador(props) {
         };
         console.log(dataToSend)
         console.log(props.catadorId)
-        axios.put(`https://18.189.110.174/api/v1/catadores/${props.catadorId}`, dataToSend)
+        axios.put(`http://3.129.19.7:3000/api/v1/catadores/${props.catadorId}`, dataToSend)
             .then(response => {
                 if (response && response.data) {
                     console.log('Catador atualizado com sucesso:', response.data);
@@ -595,7 +599,7 @@ function ListarCatadores() {
 
     const handleExcluirCatador = (catadorId) => {
 
-        axios.delete(`https://18.189.110.174/api/v1/catadores/${catadorId}`)
+        axios.delete(`http://3.129.19.7:3000/api/v1/catadores/${catadorId}`)
             .then(response => {
                 if (response && response.status === 200) {
                     toast.success('Catador excluído com sucesso!');
@@ -689,7 +693,7 @@ function ListarCatadores() {
 
     useEffect(() => {
         // Fazendo a chamada para o backend para obter os dados do catador
-        axios.get('https://18.189.110.174/api/v1/catadores/pega-catadores/associacao', config)
+        axios.get('http://3.129.19.7:3000/api/v1/catadores/pega-catadores/associacao', config)
             .then(response => {
                 setCatadorData(response.data);
 

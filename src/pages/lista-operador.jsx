@@ -44,7 +44,7 @@ const AdicionarOperadorLogistico = (props) => {
         };
         console.log(dataToSend)
 
-        axios.post('https://18.189.110.174/api/v1/operador-logistico', dataToSend)
+        axios.post('http://3.129.19.7:3000/api/v1/operador-logistico', dataToSend)
             .then(response => {
 
 
@@ -170,7 +170,7 @@ function EditarOperadorLogistico(props) {
                 console.error('Erro ao obter dados:', error);
             }
         };
-        fetchData(`https://18.189.110.174/api/v1/operador-logistico/${props.operadorId}`, setOperador);
+        fetchData(`http://3.129.19.7:3000/api/v1/operador-logistico/${props.operadorId}`, setOperador);
        
     }, [props.operadorId]);
 
@@ -188,7 +188,7 @@ function EditarOperadorLogistico(props) {
         };
         console.log(dataToSend)
         console.log(props.operadorId)
-        axios.put(`https://18.189.110.174/api/v1/operador-logistico/${props.operadorId}`, dataToSend)
+        axios.put(`http://3.129.19.7:3000/api/v1/operador-logistico/${props.operadorId}`, dataToSend)
             .then(response => {
                 if (response && response.data) {
                     console.log('Operador atualizado com sucesso:', response.data);
@@ -306,7 +306,7 @@ function ListarOperadorLogistico() {
     
         setOperadorData(prevOperadores => prevOperadores.filter(operador => operador.id !== operadorId));
 
-            axios.delete(`https://18.189.110.174/api/v1/operador-logistico/${operadorId}`)
+            axios.delete(`http://3.129.19.7:3000/api/v1/operador-logistico/${operadorId}`)
                 .then(response => {
                     if (response && response.status === 200) {
                         toast.success('Operador excluído com sucesso!');
@@ -392,7 +392,7 @@ function ListarOperadorLogistico() {
     };
 
     useEffect(() => {
-        axios.get('https://18.189.110.174/api/v1/operador-logistico', config)
+        axios.get('http://3.129.19.7:3000/api/v1/operador-logistico', config)
             .then(response => {
                 setOperadorData(response.data);
 

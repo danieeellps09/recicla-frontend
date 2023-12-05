@@ -1,43 +1,56 @@
 import React, { useState, useEffect } from "react";
-import { Button, Col, Container, Row, Image, Dropdown, Form, Stack } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Container,
+  Row,
+  Image,
+  Dropdown,
+  Form,
+  Stack,
+} from "react-bootstrap"; //TODO: 'Stack', 'Dropdown' E 'Image' NAO ESTAO SENDO USADO
 import "../style/css.css";
-import { BsArrowLeftShort, BsDownload, BsEyeFill, BsCaretRightFill } from "react-icons/bs";
-import { useLocation, useNavigate } from 'react-router-dom';
-import axios from "axios";
+import {
+  BsArrowLeftShort,
+  BsDownload,
+  BsEyeFill,
+  BsCaretRightFill,
+} from "react-icons/bs"; //TODO: 'BsEyeFill' NAO ESTAO SENDO USADO
+import { useLocation, useNavigate } from "react-router-dom";
 import { Autenticacao } from "../config/Autenticacao";
-import { id } from "date-fns/locale";
-
-
+import { id } from "date-fns/locale"; //TODO: IMPORT NAO ESTA SENDO USADO
+import { API } from "../services/api";
 
 function RelatorioVenda() {
-  const [associacaoName, setAssociacaoName] = useState('');
+  const [associacaoName, setAssociacaoName] = useState("");
   const [materiaisVendidos, setMateriaisVendidos] = useState([]);
-  const [quantidadeMateriaisVendidos, setQuantidadeMateriaisVendidos] = useState(0);
+  const [quantidadeMateriaisVendidos, setQuantidadeMateriaisVendidos] =
+    useState(0);
   const [pesoTotalComercializado, setPesoTotalComercializado] = useState(0);
-  const [idAssociacao, setIdAssociacao] = useState('');
-const [completo, setCompleto] = useState(false);
+  const [idAssociacao, setIdAssociacao] = useState("");
+  const [completo, setCompleto] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
   const vendas = location.state?.vendas || [];
-  const dataInicialParam = location.state?.startDate || '';
-  const dataFinalParam = location.state?.endDate || '';
+  const dataInicialParam = location.state?.startDate || "";
+  const dataFinalParam = location.state?.endDate || "";
 
   const formatarData = (data) => {
     const dataObj = new Date(data);
-    const dia = String(dataObj.getDate()).padStart(2, '0');
-    const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+    const dia = String(dataObj.getDate()).padStart(2, "0");
+    const mes = String(dataObj.getMonth() + 1).padStart(2, "0");
     const ano = dataObj.getFullYear();
     return `${dia}/${mes}/${ano}`;
   };
 
   const formatarDataHora = (data) => {
     const dataObj = new Date(data);
-    const dia = String(dataObj.getDate()).padStart(2, '0');
-    const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+    const dia = String(dataObj.getDate()).padStart(2, "0");
+    const mes = String(dataObj.getMonth() + 1).padStart(2, "0");
     const ano = dataObj.getFullYear();
-    const hora = String(dataObj.getHours()).padStart(2, '0');
-    const minutos = String(dataObj.getMinutes()).padStart(2, '0');
+    const hora = String(dataObj.getHours()).padStart(2, "0");
+    const minutos = String(dataObj.getMinutes()).padStart(2, "0");
     return `${dia}/${mes}/${ano} ${hora}:${minutos}`;
   };
 
@@ -46,8 +59,8 @@ const [completo, setCompleto] = useState(false);
 
   const config = {
     headers: {
-      'Authorization': `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   };
 
   const handleGoBack = () => {
@@ -56,24 +69,20 @@ const [completo, setCompleto] = useState(false);
 
   const fetchAssociacaoName = async (idAssociacao) => {
     try {
-      const response = await axios.get(`http://3.129.19.7:3000/api/v1/associacoes/${idAssociacao}`, config);
+      const response = await API.get(`/associacoes/${idAssociacao}`, config);
       setAssociacaoName(response.data.user.name);
     } catch (error) {
-      console.error('Erro ao obter nome do associacao:', error);
+      console.error("Erro ao obter nome do associacao:", error);
     }
   };
 
   useEffect(() => {
     const processarDados = () => {
-   
-   
-   
       if (vendas && vendas.length > 0) {
         vendas.forEach((venda) => {
-
-          const idAssociacao = venda.idAssociacao
+          const idAssociacao = venda.idAssociacao;
           fetchAssociacaoName(idAssociacao);
-          setIdAssociacao(idAssociacao)
+          setIdAssociacao(idAssociacao);
         });
       }
 
@@ -94,8 +103,6 @@ const [completo, setCompleto] = useState(false);
           materiais[idMaterial].quantidadeVendida += quantidadeVendida;
           materiais[idMaterial].pesoTotal += quantidadeVendida; // Ou ajuste conforme necessário
         });
-
-        
       });
 
       setMateriaisVendidos(Object.values(materiais));
@@ -104,18 +111,17 @@ const [completo, setCompleto] = useState(false);
     processarDados();
   }, [vendas]);
 
+  const handleDownload = async () => {
+    try {
+      const downloadURL = `/pdf/venda/${idAssociacao}?completo=${completo}&datainicio=${formatarData(
+        dataInicialParam
+      )}&datafim=${formatarData(dataFinalParam)}`;
 
-
- const handleDownload = async () => {
-  try {
-
-     const downloadURL = `http://3.129.19.7:3000/api/v1/pdf/venda/${idAssociacao}?completo=${completo}&datainicio=${formatarData(dataInicialParam)}&datafim=${formatarData(dataFinalParam)}`;
-
-     window.open(downloadURL, '_blank');
-  } catch (error) {
-     console.error('Erro ao baixar o relatório:', error);
-  }
-};
+      window.open(downloadURL, "_blank");
+    } catch (error) {
+      console.error("Erro ao baixar o relatório:", error);
+    }
+  };
 
   const quantidadeMateriaisVendidosNoPeriodo = materiaisVendidos.reduce(
     (total, material) => total + material.quantidadeVendida,
@@ -131,12 +137,26 @@ const [completo, setCompleto] = useState(false);
           <Col>
             <Row className="mb-3">
               <Col className="w-25 ">
-                <Form.Label className="text-orange fw-bold">DATA INICIAL</Form.Label>
-                <Form.Control type="date" disabled className="custom-focus"  value={dataInicialParam}/>
+                <Form.Label className="text-orange fw-bold">
+                  DATA INICIAL
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  disabled
+                  className="custom-focus"
+                  value={dataInicialParam}
+                />
               </Col>
               <Col className="w-25 ">
-                <Form.Label className="text-orange fw-bold">DATA FINAL</Form.Label>
-                <Form.Control type="date" disabled className="custom-focus" value={dataFinalParam}/>
+                <Form.Label className="text-orange fw-bold">
+                  DATA FINAL
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  disabled
+                  className="custom-focus"
+                  value={dataFinalParam}
+                />
               </Col>
             </Row>
           </Col>
@@ -152,7 +172,9 @@ const [completo, setCompleto] = useState(false);
 
         <Row className="w-100 my-3">
           <Col>
-            <Form.Label className="w-100 text-orange">Materiais vendidos no período:</Form.Label>
+            <Form.Label className="w-100 text-orange">
+              Materiais vendidos no período:
+            </Form.Label>
             {materiaisVendidos.map((material, index) => (
               <div key={index} className="d-flex align-items-center">
                 <Form.Control
@@ -167,7 +189,9 @@ const [completo, setCompleto] = useState(false);
             ))}
           </Col>
           <Col>
-            <Form.Label className="text-orange">Quantidade comercializada por material:</Form.Label>
+            <Form.Label className="text-orange">
+              Quantidade comercializada por material:
+            </Form.Label>
             {materiaisVendidos.map((material, index) => (
               <Form.Control
                 key={index}
@@ -179,33 +203,38 @@ const [completo, setCompleto] = useState(false);
                 disabled
               />
             ))}
-              <Form.Label className="text-orange">Quantidade de materiais vendidos no período:</Form.Label>
+            <Form.Label className="text-orange">
+              Quantidade de materiais vendidos no período:
+            </Form.Label>
             <Form.Control
               type="text"
               className="form-control custom-focus"
-              style={{ width: '120px' }}
+              style={{ width: "120px" }}
               value={`${quantidadeMateriaisVendidosNoPeriodo} kg`}
               aria-label="Disabled input example"
               disabled
             />
           </Col>
-
         </Row>
-
-
-       
 
         <Row>
           <div className="mt-5 d-flex center justify-content-evenly">
-            <Button type="submit" className="w-25 mx-2 btn-orange"  onClick={handleDownload}>
+            <Button
+              type="submit"
+              className="w-25 mx-2 btn-orange"
+              onClick={handleDownload}
+            >
               <BsDownload /> Baixar
             </Button>
-            <Button type="submit" className="w-25 mx-2 outline-white" onClick={handleGoBack}  >
+            <Button
+              type="submit"
+              className="w-25 mx-2 outline-white"
+              onClick={handleGoBack}
+            >
               <BsArrowLeftShort /> Voltar
             </Button>
           </div>
         </Row>
-
       </Container>
     </>
   );

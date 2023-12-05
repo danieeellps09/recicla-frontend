@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Col, Container, Image, Row, FormControl, Dropdown, } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Col,
+  Container,
+  Image,
+  Row,
+  FormControl,
+  Dropdown,
+} from "react-bootstrap";
 import fotoPerfil from "../images/perfil.jpg";
 
 import "../style/css.css";
-import { BsArrowLeftShort, BsCalendar, BsDownload, BsEye, BsEyeFill, } from "react-icons/bs";
+import {
+  BsArrowLeftShort,
+  BsCalendar,
+  BsDownload,
+  BsEye,
+  BsEyeFill,
+} from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Autenticacao } from "../config/Autenticacao";
-import axios from "axios";
+import { API } from "../services/api";
 
 function ListaRelatorioVendaAssociacao() {
   const [startDate, setStartDate] = useState("");
@@ -14,31 +29,24 @@ function ListaRelatorioVendaAssociacao() {
   const [vendas, setVendas] = useState([]);
   const [associacoes, setAssociacoes] = useState([]);
   const [selectedAssociacao, setSelectedAssociacao] = useState(null);
-  const [visualSelectedAssociacao, setVisualSelectedAssociacao] = useState('');
-
+  const [visualSelectedAssociacao, setVisualSelectedAssociacao] = useState("");
 
   const autenticacao = Autenticacao();
   const token = autenticacao.token;
 
   const config = {
     headers: {
-      'Authorization': `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   };
   const fetchAssociacoes = async () => {
     try {
-      const response = await axios.get(
-        "http://3.129.19.7:3000/api/v1/associacoes", config
-      );
+      const response = await API.get("/associacoes", config);
       setAssociacoes(response.data);
     } catch (error) {
       console.error("Erro ao obter lista de associacoes:", error);
     }
   };
-
-
-
-
 
   const handleLast7Days = () => {
     const today = new Date();
@@ -60,7 +68,7 @@ function ListaRelatorioVendaAssociacao() {
     setStartDate(formatDate(last30Days));
     setEndDate(formatDate(today));
   };
-  const formatDate = (date, format = 'yyyy-MM-dd') => {
+  const formatDate = (date, format = "yyyy-MM-dd") => {
     if (!(date instanceof Date)) {
       date = new Date(date);
     }
@@ -69,9 +77,9 @@ function ListaRelatorioVendaAssociacao() {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
 
-    if (format === 'yyyy-MM-dd') {
+    if (format === "yyyy-MM-dd") {
       return `${year}-${month}-${day}`;
-    } else if (format === 'dd/MM/yyyy') {
+    } else if (format === "dd/MM/yyyy") {
       return `${day}/${month}/${year}`;
     }
 
@@ -80,12 +88,12 @@ function ListaRelatorioVendaAssociacao() {
   };
 
   const handleassociacaoChange = (event) => {
-    const associacao = associacoes.find(a => a.user.name === event.target.innerText);
-    setSelectedAssociacao(associacao ? associacao.id : '');
-    setVisualSelectedAssociacao(associacao ? associacao.user.name : '');
+    const associacao = associacoes.find(
+      (a) => a.user.name === event.target.innerText
+    );
+    setSelectedAssociacao(associacao ? associacao.id : "");
+    setVisualSelectedAssociacao(associacao ? associacao.user.name : "");
   };
-
-
 
   useEffect(() => {
     fetchAssociacoes();
@@ -98,70 +106,66 @@ function ListaRelatorioVendaAssociacao() {
   };
 
   const params = {
-    datainicio: formatDate(startDate, 'dd/MM/yyyy'),
-    datafim: formatDate(endDate, 'dd/MM/yyyy')
-  }
-  console.log('Parâmetros da Requisição:', params);
+    datainicio: formatDate(startDate, "dd/MM/yyyy"),
+    datafim: formatDate(endDate, "dd/MM/yyyy"),
+  };
+  console.log("Parâmetros da Requisição:", params);
 
   const handleClick = async () => {
     try {
-      const response = await axios.get(
-        `http://3.129.19.7:3000/api/v1/forms/venda/findBetweenDates/${selectedAssociacao}`,
+      const response = await API.get(
+        `/forms/venda/findBetweenDates/${selectedAssociacao}`,
         {
           params,
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-      console.log('Após a solicitação com sucesso');
+      console.log("Após a solicitação com sucesso");
       setVendas(response.data);
-      console.log('venda antes de renderizar RelatorioColeta:', response.data);
+      console.log("venda antes de renderizar RelatorioColeta:", response.data);
 
-      navigate('/relatorio-venda-adm', {
+      navigate("/relatorio-venda-adm", {
         state: {
           vendas: response.data,
           startDate: startDate,
-          endDate: endDate
-        }
+          endDate: endDate,
+        },
       });
-
     } catch (error) {
-      console.error('Erro ao obter dados:', error);
+      console.error("Erro ao obter dados:", error);
     }
   };
 
-
-
   const handleDownloadPDF = async () => {
     try {
-      const response = await axios.get(
-        `http://3.129.19.7:3000/api/v1/pdf/venda/${selectedAssociacao}`,  // Supondo que você deseja usar o ID da primeira venda
+      const response = await API.get(
+        `/pdf/venda/${selectedAssociacao}`, // Supondo que você deseja usar o ID da primeira venda
         {
           params: {
             completo: true,
-            datainicio: formatDate(startDate, 'dd/MM/yyyy'),
-            datafim: formatDate(endDate, 'dd/MM/yyyy'),
+            datainicio: formatDate(startDate, "dd/MM/yyyy"),
+            datafim: formatDate(endDate, "dd/MM/yyyy"),
           },
-          responseType: 'blob',
+          responseType: "blob",
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-  
+
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', 'relatorio.pdf');
+      link.setAttribute("download", "relatorio.pdf");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error('Erro ao baixar o PDF:', error);
+      console.error("Erro ao baixar o PDF:", error);
     }
   };
-  
 
   return (
     <>
@@ -176,11 +180,14 @@ function ListaRelatorioVendaAssociacao() {
           <hr className="mb-4" />
           <Row className="mt-3">
             <Col>
-              <Dropdown className='w-100'>
-                <Dropdown.Toggle className='w-100 outline-white' id="dropdown-basic">
-                  {visualSelectedAssociacao || 'Selecione uma Associacao'}
+              <Dropdown className="w-100">
+                <Dropdown.Toggle
+                  className="w-100 outline-white"
+                  id="dropdown-basic"
+                >
+                  {visualSelectedAssociacao || "Selecione uma Associacao"}
                 </Dropdown.Toggle>
-                <Dropdown.Menu className='w-100'>
+                <Dropdown.Menu className="w-100">
                   {associacoes.map((associacao, index) => (
                     <Dropdown.Item key={index} onClick={handleassociacaoChange}>
                       {associacao.user.name}
@@ -236,18 +243,26 @@ function ListaRelatorioVendaAssociacao() {
           </Row>
 
           <div className="mt-5 d-flex center justify-content-evenly">
-
-
-            <Button type="submit" className="w-25 mx-2 btn-orange" onClick={handleClick}>
+            <Button
+              type="submit"
+              className="w-25 mx-2 btn-orange"
+              onClick={handleClick}
+            >
               <BsEyeFill /> Visualizar
             </Button>
 
-            <Button type="submit" className="w-25 mx-2 btn-orange"
-            onClick={handleDownloadPDF}
+            <Button
+              type="submit"
+              className="w-25 mx-2 btn-orange"
+              onClick={handleDownloadPDF}
             >
               <BsDownload /> Baixar
             </Button>
-            <Button type="submit" className="w-25 mx-2 outline-white " onClick={handleGoBack}>
+            <Button
+              type="submit"
+              className="w-25 mx-2 outline-white "
+              onClick={handleGoBack}
+            >
               <BsArrowLeftShort /> Voltar
             </Button>
           </div>

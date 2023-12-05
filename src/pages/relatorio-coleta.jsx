@@ -8,79 +8,75 @@ import {
   Dropdown,
   Form,
   Stack,
-} from "react-bootstrap";
+} from "react-bootstrap"; //TODO: "Stack", "Dropdown" E "Image"  NÃO ESTAO SENDO USADO
 import "../style/css.css";
 import {
   BsArrowLeftShort,
   BsDownload,
   BsEyeFill,
   BsCaretRightFill,
-} from "react-icons/bs";
-import axios from "axios";
+} from "react-icons/bs"; //TODO: "BsEyeFill" NÃO ESTAO SENDO USADO
 import { Autenticacao } from "../config/Autenticacao";
-import { useLocation, useNavigate } from 'react-router-dom';
-
-
+import { useLocation, useNavigate } from "react-router-dom";
+import { API } from "../services/api";
 
 function RelatorioColeta() {
-  const [catadorName, setCatadorName] = useState('');
-  const [funcaoName, setFuncaoName] = useState('');
-  const [associacaoName, setAssociacaoName] = useState('');
+  const [catadorName, setCatadorName] = useState("");
+  const [funcaoName, setFuncaoName] = useState("");
+  const [associacaoName, setAssociacaoName] = useState("");
 
-  const [veiculos, setVeiculos] = useState([]);
+  const [veiculos, setVeiculos] = useState([]); //TODO: "SETTER E STATE" NÃO ESTAO SENDO USADO
   const [quantidadeTotal, setQuantidadeTotal] = useState(0);
   const [rotasTotais, setRotasTotais] = useState(0);
   const [veiculosUtilizados, setVeiculosUtilizados] = useState([]);
   const [rotasRealizadas, setRotasRealizadas] = useState(0);
-  const [idCatador, setIdCatador] = useState('');
-  const [completo, setCompleto] = useState(false);
-
-
-
-
+  const [idCatador, setIdCatador] = useState("");
+  const [completo, setCompleto] = useState(false); //TODO: "SETTER" NÃO ESTA SENDO USADO
 
   const location = useLocation();
   const coletas = location.state?.coletas || [];
-  const dataInicialParam = location.state?.startDate || '';
-  const dataFinalParam = location.state?.endDate || '';
-
+  const dataInicialParam = location.state?.startDate || "";
+  const dataFinalParam = location.state?.endDate || "";
 
   const autenticacao = Autenticacao();
   const token = autenticacao.token;
 
   const config = {
     headers: {
-      'Authorization': `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   };
   const fetchCatadorName = async (idCatador) => {
     try {
-      const response = await axios.get(`http://3.129.19.7:3000/api/v1/catadores/${idCatador}`, config);
+      const response = await API.get(`/catadores/${idCatador}`, config);
       setCatadorName(response.data.user.name);
-      setFuncaoName(response.data.funcoescatador.funcao)
+      setFuncaoName(response.data.funcoescatador.funcao);
     } catch (error) {
-      console.error('Erro ao obter nome do catador:', error);
+      console.error("Erro ao obter nome do catador:", error);
     }
   };
 
   const fetchAssociacaoName = async (idAssociacao) => {
     try {
-      const response = await axios.get(`http://3.129.19.7:3000/api/v1/associacoes/${idAssociacao}`, config);
+      const response = await API.get(`/associacoes/${idAssociacao}`, config);
       setAssociacaoName(response.data.user.name);
     } catch (error) {
-      console.error('Erro ao obter nome do associacao:', error);
+      console.error("Erro ao obter nome do associacao:", error);
     }
   };
   const fetchVeiculoInfo = async (veiculoId) => {
     try {
-      const response = await axios.get(`http://3.129.19.7:3000/api/v1/veiculos/${veiculoId}`);
+      const response = await API.get(`/veiculos/${veiculoId}`);
       const veiculo = response.data.nomeVeiculo;
-      setVeiculosUtilizados((prevVeiculos) => prevVeiculos.includes(veiculo) ? prevVeiculos : [...prevVeiculos, veiculo]);
+      setVeiculosUtilizados((prevVeiculos) =>
+        prevVeiculos.includes(veiculo)
+          ? prevVeiculos
+          : [...prevVeiculos, veiculo]
+      );
     } catch (error) {
-      console.error('Erro ao obter informações do veículo:', error);
+      console.error("Erro ao obter informações do veículo:", error);
     }
   };
-
 
   const calcularRotasRealizadas = (coletas) => {
     return coletas.reduce((total, coleta) => {
@@ -104,28 +100,26 @@ function RelatorioColeta() {
 
   const formatarData = (data) => {
     const dataObj = new Date(data);
-    const dia = String(dataObj.getDate()).padStart(2, '0');
-    const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+    const dia = String(dataObj.getDate()).padStart(2, "0");
+    const mes = String(dataObj.getMonth() + 1).padStart(2, "0");
     const ano = dataObj.getFullYear();
     return `${dia}/${mes}/${ano}`;
   };
 
   const formatarDataHora = (data) => {
     const dataObj = new Date(data);
-    const dia = String(dataObj.getDate()).padStart(2, '0');
-    const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+    const dia = String(dataObj.getDate()).padStart(2, "0");
+    const mes = String(dataObj.getMonth() + 1).padStart(2, "0");
     const ano = dataObj.getFullYear();
-    const hora = String(dataObj.getHours()).padStart(2, '0');
-    const minutos = String(dataObj.getMinutes()).padStart(2, '0');
+    const hora = String(dataObj.getHours()).padStart(2, "0");
+    const minutos = String(dataObj.getMinutes()).padStart(2, "0");
     return `${dia}/${mes}/${ano} ${hora}:${minutos}`;
   };
-
 
   useEffect(() => {
     if (coletas && coletas.length > 0) {
       coletas.forEach((coleta) => {
-
-        setIdCatador(coleta.idCatador)
+        setIdCatador(coleta.idCatador);
         fetchCatadorName(coleta.idCatador);
         fetchAssociacaoName(coleta.idAssociacao);
         fetchVeiculoInfo(coleta.idVeiculo);
@@ -140,19 +134,19 @@ function RelatorioColeta() {
       const rotasRealizadasCount = calcularRotasRealizadas(coletas);
       setRotasRealizadas(rotasRealizadasCount);
 
-      console.log('coletas dentro do useEffect:', coletas);
-      console.log('useEffect em RelatorioColeta foi chamado.');
-
+      console.log("coletas dentro do useEffect:", coletas);
+      console.log("useEffect em RelatorioColeta foi chamado.");
     }
   }, [coletas]);
   const handleDownloadPDF = async () => {
     try {
-  
-       const downloadURL = `http://3.129.19.7:3000/api/v1/pdf/coleta/${idCatador}?completo=${completo}&datainicio=${formatarData(dataInicialParam)}&datafim=${formatarData(dataFinalParam)}`;
-  
-       window.open(downloadURL, '_blank');
+      const downloadURL = `/pdf/coleta/${idCatador}?completo=${completo}&datainicio=${formatarData(
+        dataInicialParam
+      )}&datafim=${formatarData(dataFinalParam)}`;
+
+      window.open(downloadURL, "_blank");
     } catch (error) {
-       console.error('Erro ao baixar o relatório:', error);
+      console.error("Erro ao baixar o relatório:", error);
     }
   };
   return (
@@ -165,18 +159,32 @@ function RelatorioColeta() {
           <Col>
             <Row className="mb-3">
               <Col className="w-25 ">
-                <Form.Label className="text-orange fw-bold">DATA INICIAL</Form.Label>
-                <Form.Control type="date" disabled className="custom-focus" value={dataInicialParam} />
+                <Form.Label className="text-orange fw-bold">
+                  DATA INICIAL
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  disabled
+                  className="custom-focus"
+                  value={dataInicialParam}
+                />
               </Col>
               <Col className="w-25 ">
-                <Form.Label className="text-orange fw-bold">DATA FINAL</Form.Label>
-                <Form.Control type="date" disabled className="custom-focus" value={dataFinalParam} />
+                <Form.Label className="text-orange fw-bold">
+                  DATA FINAL
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  disabled
+                  className="custom-focus"
+                  value={dataFinalParam}
+                />
               </Col>
             </Row>
           </Col>
           <Col className="d-flex align-items-center justify-content-end">
             <Form.Label className="text-end fw-bold small text-secondary">
-              RELATÓRIO DE COLETA - ASSOCIAÇÃO  {associacaoName}
+              RELATÓRIO DE COLETA - ASSOCIAÇÃO {associacaoName}
               <br />
               RELATÓRIO EXTRAÍDO ÀS {formatarDataHora(new Date())}
             </Form.Label>
@@ -219,7 +227,7 @@ function RelatorioColeta() {
               disabled
             />
           </Col>
-          
+
           <Col>
             <Form.Label className="text-orange">
               Quantidade de residíduos coletados:{" "}
@@ -229,7 +237,7 @@ function RelatorioColeta() {
                 <Form.Control
                   type="text"
                   className="form-control custom-focus"
-                  style={{ width: '100px' }}
+                  style={{ width: "100px" }}
                   value={`${coleta.quantidade} kg`}
                   aria-label="Disabled input example"
                   disabled
@@ -238,35 +246,36 @@ function RelatorioColeta() {
                 <Form.Control
                   type="text"
                   className="form-control custom-focus"
-                  style={{ width: '150px' }}
-                  value={formatarData(coleta.dataColeta)} 
+                  style={{ width: "150px" }}
+                  value={formatarData(coleta.dataColeta)}
                   aria-label="Disabled input example"
                   disabled
                 />
               </div>
-
             ))}
           </Col>
         </Row>
         <Row className="w-100 my-1">
-  <Col>
-    {/* Novo campo para mostrar a quantidade de rotas realizadas */}
-    <Form.Label className="w-100 text-orange">
-      Rotas totais realizadas em todos os pontos:
-    </Form.Label>
-    <Form.Control
-      type="text"
-      className="form-control custom-focus"
-      style={{ width: '150px' }}
-      value={rotasRealizadas}
-      aria-label="Disabled input exampl"
-      disabled
-    />
-  </Col>
-</Row>
+          <Col>
+            {/* Novo campo para mostrar a quantidade de rotas realizadas */}
+            <Form.Label className="w-100 text-orange">
+              Rotas totais realizadas em todos os pontos:
+            </Form.Label>
+            <Form.Control
+              type="text"
+              className="form-control custom-focus"
+              style={{ width: "150px" }}
+              value={rotasRealizadas}
+              aria-label="Disabled input exampl"
+              disabled
+            />
+          </Col>
+        </Row>
         <Row className="w-100 my-3">
           <Col>
-            <Form.Label className="w-100 text-orange">Veículos usados no período:</Form.Label>
+            <Form.Label className="w-100 text-orange">
+              Veículos usados no período:
+            </Form.Label>
             {veiculosUtilizados.map((veiculo, index) => (
               <div key={index} className="d-flex align-items-center">
                 <Form.Control
@@ -291,16 +300,20 @@ function RelatorioColeta() {
               aria-label="Disabled input exampl"
               disabled
             />
-
           </Col>
           <div className="mt-5 d-flex center justify-content-evenly">
-            <Button type="submit" className="w-25 mx-2 btn-orange"
-                        onClick={handleDownloadPDF}
-                        >
+            <Button
+              type="submit"
+              className="w-25 mx-2 btn-orange"
+              onClick={handleDownloadPDF}
+            >
               <BsDownload /> Baixar
             </Button>
-            <Button type="submit" className="w-25 mx-2 outline-white"
-            onClick={handleGoBack}>
+            <Button
+              type="submit"
+              className="w-25 mx-2 outline-white"
+              onClick={handleGoBack}
+            >
               <BsArrowLeftShort /> Voltar
             </Button>
           </div>

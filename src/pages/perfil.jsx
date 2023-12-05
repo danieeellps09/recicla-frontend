@@ -1,20 +1,32 @@
 import React, { useState } from "react";
-import {  Button,  Container,  Form,  FormControl,  Image,  Modal,  Row,} from "react-bootstrap";
-import {  BsEyeSlashFill,  BsKeyFill,  BsEyeFill,  BsFillEnvelopeFill,} from "react-icons/bs";
+import {
+  Button,
+  Container,
+  Form,
+  FormControl,
+  Image,
+  Modal,
+  Row,
+} from "react-bootstrap";
+import {
+  BsEyeSlashFill,
+  BsKeyFill,
+  BsEyeFill,
+  BsFillEnvelopeFill,
+} from "react-icons/bs";
 import fotoAdmin from "../images/imgadmin.png";
 import fotoAssociacao from "../images/imgassociacao.png";
 import fotoCatador from "../images/imgcatador.png";
 import fotoOperadorLogistico from "../images/imgopeadorlogistico.png";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Autenticacao } from "../config/Autenticacao";
 
 import "../style/css.css";
+import { API } from "../services/api";
 
 function MudarSenha(props) {
-
-
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -35,39 +47,49 @@ function MudarSenha(props) {
 
   const handleSubmitSenha = async (event) => {
     event.preventDefault();
-  
+
     const autenticacao = Autenticacao();
     const token = autenticacao.token;
-    console.log('Token:', token);
+    console.log("Token:", token);
 
-console.log(senha)
+    console.log(senha);
     if (senha === confirmarSenha) {
       try {
-        const response = await fetch('http://3.129.19.7:3000/api/v1/users/update/password', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-
-          },
-          body: JSON.stringify({
+        //TODO: MUDEI PARA USAR O AXIOS, VERIFIQUE SE ESTA FUNCIONADO DA MESMA FORMA
+        const response = await API.put(
+          "/users/update/password",
+          {
             password: senha,
-          }),
-        });
-  
-        if (response.ok) {
-          toast.success('senha alterada com sucesso');
+          },
+          {
+            headers: {
+              "Content-Type": "application/json", //TODO: GERALMENTE NÃO PRECISA DEFINIR O CONTENT-TYPE
+              //POIS CREIO QUE POR DEFAULT O AXIOS JA SEJA ESSE CONTENT-TYPE
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        //TODO: NAO PRECISA DO IF, POIS QUANDO CAI NO TRY, ELE JA SERÁ UM 200
+        if (response.status === 200) {
+          toast.success("Senha alterada com sucesso");
           setSenha("");
           setConfirmarSenha("");
-          
           props.onHide();
-          console.log('Senha alterada com sucesso!');
+          console.log("Senha alterada com sucesso!");
         } else {
-          console.error('Erro ao alterar a senha:', response.statusText);
+          console.error("Erro ao alterar a senha:", response.statusText);
+          toast.error("Erro ao mudar senha");
         }
       } catch (error) {
-        console.error('Erro na chamada de API:', error);
-        toast.error('erro ao mudar senha');
+        console.error("Erro na chamada de API:", error);
+        if (error.response) {
+          console.error("Erro de resposta:", error.response.data);
+        } else if (error.request) {
+          console.error("Erro de requisição:", error.request);
+        } else {
+          console.error("Erro:", error.message);
+        }
+        toast.error("Erro ao mudar senha");
       }
     } else {
       console.log("As senhas não coincidem. Por favor, digite novamente.");
@@ -85,7 +107,7 @@ console.log(senha)
           <Modal.Title className="text-orange">Alterar Senha</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form >
+          <Form>
             <Form.Label className="text-orange my-2">
               Digite sua nova senha
             </Form.Label>
@@ -156,40 +178,44 @@ function MudarEmail(props) {
   const handleSubmitEmail = async (event) => {
     event.preventDefault();
 
-     const autenticacao = Autenticacao();
-     const token = autenticacao.token;
- 
-   
-  
+    const autenticacao = Autenticacao();
+    const token = autenticacao.token;
+
     if (email === confirmarEmail) {
+      //TODO: MUDEI PARA USAR O AXIOS, VERIFIQUE SE ESTA FUNCIONADO DA MESMA FORMA
+
       try {
-        const response = await fetch('http://3.129.19.7:3000/api/v1/users/update/email', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
+        const response = await API.put(
+          "/users/update/email",
+          {
             email: email,
-          }),
-        });
-  
-        if (response.ok) {
-          toast.success('email alterado com sucesso');
+          },
+          {
+            headers: {
+              "Content-Type": "application/json", //TODO: GERALMENTE NÃO PRECISA DEFINIR O CONTENT-TYPE
+              //POIS CREIO QUE POR DEFAULT O AXIOS JA SEJA ESSE CONTENT-TYPE
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        //TODO: NAO PRECISA DO IF, POIS QUANDO CAI NO TRY, ELE JA SERÁ UM 200
+        if (response.status === 200) {
+          toast.success("email alterado com sucesso");
           setEmail("");
           setConfirmarEmail("");
-          
+
           props.onHide();
-          console.log('Email alterado com sucesso!');
+          console.log("Email alterado com sucesso!");
         } else {
-          console.error('Erro ao alterar o email:', response.statusText);
+          console.error("Erro ao alterar o email:", response.statusText);
         }
       } catch (error) {
-        toast.error('erro ao alterar o email')
-        console.error('Erro na chamada de API:', error);
+        toast.error("erro ao alterar o email");
+        console.error("Erro na chamada de API:", error);
       }
     } else {
-      toast.error('Os emails não coincidem. Por favor, digite novamente.')
+      toast.error("Os emails não coincidem. Por favor, digite novamente.");
       console.log("Os emails não coincidem. Por favor, digite novamente.");
     }
   };
@@ -206,7 +232,7 @@ function MudarEmail(props) {
           <Modal.Title className="text-orange">Alterar Email</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form >
+          <Form>
             <Form.Label className="text-orange my-2">
               Digite seu novo e-mail
             </Form.Label>
@@ -241,7 +267,7 @@ function MudarEmail(props) {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button className="btn-orange" onClick={handleSubmitEmail} >
+          <Button className="btn-orange" onClick={handleSubmitEmail}>
             Mudar email
           </Button>
         </Modal.Footer>
@@ -267,7 +293,7 @@ function Perfil() {
     admin: fotoAdmin,
     associacao: fotoAssociacao,
     catador: fotoCatador,
-    operadorlogistico: fotoOperadorLogistico 
+    operadorlogistico: fotoOperadorLogistico,
   };
 
   return (
@@ -278,12 +304,12 @@ function Perfil() {
       >
         <Row className="border bg-white rounded-5 shadow mt-5 w-100 justify-content-center p-5">
           <div className="text-center d-flex flex-column align-items-center">
-          <Image
-  src={fotoPerfil[func]} // Selecionar a imagem correta com base em 'func'
-  roundedCircle
-  alt="Foto de Perfil"
-  className="img-fluid perfil"
-/>
+            <Image
+              src={fotoPerfil[func]} // Selecionar a imagem correta com base em 'func'
+              roundedCircle
+              alt="Foto de Perfil"
+              className="img-fluid perfil"
+            />
             <h3 className="text-orange">{userName} </h3>
             <p className="mb-3 text-orange">{func.toUpperCase()}</p>
 
@@ -307,7 +333,8 @@ function Perfil() {
 
             <Button
               type="submit"
-              className="outline-white rounded-5 w-25 p-2 mt-4" onClick={handleGoBack}
+              className="outline-white rounded-5 w-25 p-2 mt-4"
+              onClick={handleGoBack}
             >
               Voltar
             </Button>

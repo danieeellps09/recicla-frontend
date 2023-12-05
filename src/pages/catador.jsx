@@ -4,7 +4,7 @@ import {
   BsFillFileEarmarkFill,
   BsBarChartFill,
   BsRecycle,
-} from "react-icons/bs";
+} from "react-icons/bs"; //TODO:  'BsRecycle' NÃO ESTA SENDO USADO
 import TelaAdmin from "../images/telaadmin.svg";
 import "../style/css.css";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +36,8 @@ function Catador() {
                 Você está acessando como{" "}
                 <span style={{ color: "#EF7A2A" }}>CATADOR</span> da plataforma.
               </h5>
+              {/* TODO: DARIA PARA APLICAR UMA REFATORACO NOS BOTOES ABAIXO, IGUAL EU
+            REALIZEI EM OUTRAS TELAS, CASO QUEIRA */}
               <Button
                 type="submit"
                 onClick={linkListaColeta}
@@ -49,7 +51,8 @@ function Catador() {
                 onClick={linkRelatorioColeta}
                 className="rounded-5 btn-orange w-100 p-3 mb-2"
               >
-                <BsBarChartFill size={20} className="m-2" /> Relatório de Coletas{" "}
+                <BsBarChartFill size={20} className="m-2" /> Relatório de
+                Coletas
               </Button>
             </div>
           </Col>

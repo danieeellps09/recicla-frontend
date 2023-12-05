@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Col, Container, Row, Dropdown } from "react-bootstrap";
-import axios from "axios";
 import { BsArrowLeftShort, BsDownload, BsEyeFill } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Autenticacao } from "../config/Autenticacao";
+import { API } from "../services/api";
 
 function ListaRelatorioColeta() {
   const [startDate, setStartDate] = useState("");
@@ -11,10 +11,8 @@ function ListaRelatorioColeta() {
   const [coletas, setColetas] = useState([]);
   const [catadores, setCatadores] = useState([]);
   const [selectedCatador, setSelectedCatador] = useState(null);
-  const [visualSelectedCatador, setVisualSelectedCatador] = useState('');
-  const [idCatador, setIdCatador] = useState('');
-
-
+  const [visualSelectedCatador, setVisualSelectedCatador] = useState("");
+  const [idCatador, setIdCatador] = useState("");
 
   // Função para carregar a lista de catadores
   const autenticacao = Autenticacao();
@@ -22,16 +20,13 @@ function ListaRelatorioColeta() {
 
   const config = {
     headers: {
-      'Authorization': `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   };
   const fetchCatadores = async () => {
     try {
-      const response = await axios.get(
-        "http://3.129.19.7:3000/api/v1/catadores",config
-      );
+      const response = await API.get("/catadores", config);
       setCatadores(response.data);
-      
     } catch (error) {
       console.error("Erro ao obter lista de catadores:", error);
     }
@@ -40,6 +35,10 @@ function ListaRelatorioColeta() {
   useEffect(() => {
     fetchCatadores();
   }, []); // Carregar a lista de catadores quando o componente for montado
+
+  //TODO: 'handleLast7Days','handleLast15Days', 'handleLast30Days' E 'formatDate'.COMO DISSE EM OUTRAS PARTES DO CODIGO, PODE SER DEFINIDO ESSAS FUNCOES COMO
+  //UTILITARIAS, OU SEJA CRIE UM ARQUIVO PARA ELAS E IMPORTE-AS QUANDO PRECISAR, ISSO EVITA
+  //REPETICAO DE CODIGO
 
   const handleLast7Days = () => {
     const today = new Date();
@@ -80,19 +79,17 @@ function ListaRelatorioColeta() {
     return `${year}-${month}-${day}`;
   };
 
-  const handlecatadorChange = (event) => {
-    const catador = catadores.find(a => a.user.name === event.target.innerText);
-    setSelectedCatador(catador ? catador.id : '');
-    setVisualSelectedCatador(catador ? catador.user.name : '');
-};
+  const handlecatadorChange = ({ id, user: { name } }) => {
+    //TODO: REMOVI OS TERNARIOS, POIS CREIO QUE O ID E O NAME SEMPRE IRA VIR NA REQUISICAO
+    setSelectedCatador(id);
+    setVisualSelectedCatador(name);
+  };
 
   const navigate = useNavigate();
   const location = useLocation();
   const handleGoBack = () => {
     navigate(-1);
   };
-
-  
 
   const params = {
     datainicio: formatDate(startDate, "dd/MM/yyyy"),
@@ -101,9 +98,9 @@ function ListaRelatorioColeta() {
 
   const handleClick = async () => {
     try {
-      console.log(`${selectedCatador}`)
-      const response = await axios.get(
-        `http://3.129.19.7:3000/api/v1/forms/coleta/findBetweenDates/${selectedCatador}`,
+      console.log(`${selectedCatador}`);
+      const response = await API.get(
+        `/forms/coleta/findBetweenDates/${selectedCatador}`,
         {
           params,
           headers: {
@@ -124,36 +121,34 @@ function ListaRelatorioColeta() {
     }
   };
 
-  
   const handleDownloadPDF = async () => {
     try {
-      const response = await axios.get(
-        `http://3.129.19.7:3000/api/v1/pdf/coleta/${selectedCatador}`,  // Supondo que você deseja usar o ID da primeira venda
+      const response = await API.get(
+        `/pdf/coleta/${selectedCatador}`, // Supondo que você deseja usar o ID da primeira venda
         {
           params: {
             completo: true,
-            datainicio: formatDate(startDate, 'dd/MM/yyyy'),
-            datafim: formatDate(endDate, 'dd/MM/yyyy'),
+            datainicio: formatDate(startDate, "dd/MM/yyyy"),
+            datafim: formatDate(endDate, "dd/MM/yyyy"),
           },
-          responseType: 'blob',
+          responseType: "blob",
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-  
+
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', 'relatorio.pdf');
+      link.setAttribute("download", "relatorio.pdf");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error('Erro ao baixar o PDF:', error);
+      console.error("Erro ao baixar o PDF:", error);
     }
   };
-
 
   return (
     <>
@@ -168,20 +163,30 @@ function ListaRelatorioColeta() {
           <hr className="mb-4" />
           <Row className="mt-3">
             <Col>
-            <Dropdown className='w-100'>
-                        <Dropdown.Toggle className='w-100 outline-white' id="dropdown-basic">
-                            {visualSelectedCatador || 'Selecione um Catador'}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu className='w-100'>
-                            {catadores.map((catador, index) => (
-                                <Dropdown.Item key={index} onClick={handlecatadorChange}>
-                                    {catador.user.name}
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                    </Col>
+              <Dropdown className="w-100">
+                <Dropdown.Toggle
+                  className="w-100 outline-white"
+                  id="dropdown-basic"
+                >
+                  {visualSelectedCatador || "Selecione um Catador"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="w-100">
+                  {catadores.map((catador, index) => (
+                    <Dropdown.Item
+                      key={catador.id} //TODO: SEMPRE USE IDENTIFICADORES NA KEY UNICOS COMO: 'IDS', USE O INDEX
+                      //APENAS EM ULTIMO CASO, PQ NÃO É UMA BOA PRATICA,
+                      //JA QUE AS VEZES O REACT PODE PERDER REFERENCIA
+                      onClick={() => handlecatadorChange(catador)}
+                    >
+                      {catador.user.name}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
+            </Col>
           </Row>
+
+          {/* TODO: DARIA PRA REFATORAR ESSES ITENS ABAIXO, COMO FIZ EM ALGUMAS TELAS*/}
           <Row className="justify-content-evenly mt-2">
             <Form.Label className="text-orange mt-2 ps-1">
               Escolha um Período
@@ -227,7 +232,6 @@ function ListaRelatorioColeta() {
           </Row>
 
           {/* Dropdown para selecionar catador */}
-        
 
           <div className="mt-5 d-flex center justify-content-evenly">
             <Button
@@ -237,9 +241,11 @@ function ListaRelatorioColeta() {
             >
               <BsEyeFill /> Visualizar
             </Button>
-            <Button type="submit" className="w-25 mx-2 btn-orange"
-                        onClick={handleDownloadPDF}
-                        >
+            <Button
+              type="submit"
+              className="w-25 mx-2 btn-orange"
+              onClick={handleDownloadPDF}
+            >
               <BsDownload /> Baixar
             </Button>
             <Button

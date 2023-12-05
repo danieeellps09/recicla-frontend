@@ -2,25 +2,30 @@ import React, { useState } from "react";
 import { Modal, Form, FormControl, Button } from "react-bootstrap";
 import { BsFillEnvelopeFill } from "react-icons/bs";
 import { toast } from "react-hot-toast";
-import axios from "axios";
+import { API } from "../services/api";
 
 function EsqueciSenhaModal({ show, onClose }) {
   const [email, setEmail] = useState("");
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.get(`http://3.129.19.7:3000/api/v1/users`);
+      const response = await API.get("/users");
       const usuarios = response.data;
 
-      const isEmailRegistered = usuarios.some(usuario => usuario.email === email);
+      const isEmailRegistered = usuarios.some(
+        (usuario) => usuario.email === email
+      );
 
       if (isEmailRegistered) {
-        await axios.post(`http://3.129.19.7:3000/esqueceu-senha`, { email });
+        await API.post("/esqueceu-senha", { email });
 
-        toast.success("Instruções de recuperação de senha enviadas para o email.", {
-          position: "bottom-right",
-          duration: 2000,
-        });
+        toast.success(
+          "Instruções de recuperação de senha enviadas para o email.",
+          {
+            position: "bottom-right",
+            duration: 2000,
+          }
+        );
         onClose();
       } else {
         toast.error("O email informado não está cadastrado.", {
@@ -29,10 +34,13 @@ function EsqueciSenhaModal({ show, onClose }) {
         });
       }
     } catch (error) {
-      toast.error("Ocorreu um erro ao enviar as instruções de recuperação de senha.", {
-        position: "bottom-right",
-        duration: 2000,
-      });
+      toast.error(
+        "Ocorreu um erro ao enviar as instruções de recuperação de senha.",
+        {
+          position: "bottom-right",
+          duration: 2000,
+        }
+      );
       console.error(error);
     }
   };
@@ -48,7 +56,8 @@ function EsqueciSenhaModal({ show, onClose }) {
       <Modal.Body>
         <Form>
           <h6 className="mt-2 mb-2 text-orange">
-            Informe o e-mail de cadastro e enviaremos as instruções para você recuperar sua senha
+            Informe o e-mail de cadastro e enviaremos as instruções para você
+            recuperar sua senha
           </h6>
 
           <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
@@ -67,7 +76,11 @@ function EsqueciSenhaModal({ show, onClose }) {
           </Form.Group>
         </Form>
         <div className="d-grid gap-2 w-100">
-          <Button type="submit" className="rounded btn-orange w-100 mb-1" onClick={handleSubmit}>
+          <Button
+            type="submit"
+            className="rounded btn-orange w-100 mb-1"
+            onClick={handleSubmit}
+          >
             Recuperar senha
           </Button>
         </div>

@@ -71,12 +71,10 @@ const AdicionarCatador = (props) => {
     fetchData("/funcoes-catador", setFuncoes);
   }, []);
 
-  const handleAssociacaoChange = (event) => {
-    const associacao = associacoes.find(
-      (a) => a.user.name === event.target.innerText
-    );
-    setSelectedAssociacao(associacao ? associacao.id : "");
-    setVisualSelectedAssociacao(associacao ? associacao.user.name : "");
+  const handleassociacaoChange = ({ id, user: { name } }) => {
+  
+    setSelectedAssociacao(id);
+    setVisualSelectedAssociacao(name);
   };
 
   const handleEtniaChange = (event) => {
@@ -215,20 +213,20 @@ const AdicionarCatador = (props) => {
 
           <Form.Label className="text-orange">Associação</Form.Label>
           <Dropdown className="w-100">
-            <Dropdown.Toggle
-              className="w-100 outline-white"
-              id="dropdown-basic"
-            >
-              {visualSelectedAssociacao || "Selecione uma Associação"}
-            </Dropdown.Toggle>
-            <Dropdown.Menu className="w-100">
-              {associacoes.map((associacao, index) => (
-                <Dropdown.Item key={index} onClick={handleAssociacaoChange}>
-                  {associacao.user.name}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
+                <Dropdown.Toggle
+                  className="w-100 outline-white"
+                  id="dropdown-basic"
+                >
+                  {visualSelectedAssociacao || "Selecione uma Associacao"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="w-100">
+                  {associacoes.map((associacao, index) => (
+                    <Dropdown.Item key={associacao.id} onClick={() => handleassociacaoChange(associacao)}>
+                      {associacao.user.name}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
 
           <Form.Label className="text-orange">Etnia</Form.Label>
           <Dropdown className="w-100">
@@ -687,6 +685,7 @@ function ListarCatadores() {
         setCatadorData(response.data);
 
         if (!showSuccessMessage) {
+          
           toast.success("Catadores listados com sucesso!");
           setShowSuccessMessage(true); // Atualize o estado para evitar exibir a mensagem novamente
         }
@@ -731,22 +730,12 @@ function ListarCatadores() {
           md={12}
           className="d-flex align-items-center justify-content-center"
         >
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            ADMINISTRADOR
-          </Button>
+         
           <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
             <BsPeopleFill size={20} className="m-2" />
             CATADOR
           </Button>
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            ASSOCIAÇÃO
-          </Button>
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            OP. LOGÍSTICO
-          </Button>
+      
         </Col>
         <hr className="m-4" />
         <Col

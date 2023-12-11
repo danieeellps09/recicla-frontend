@@ -210,6 +210,8 @@ function ListaRelatorioColetaCatador() {
               type="submit"
               className="w-25 mx-2 btn-orange"
               onClick={handleClick}
+              disabled={!startDate || !endDate }
+
             >
               <BsEyeFill /> Visualizar
             </Button>
@@ -218,6 +220,8 @@ function ListaRelatorioColetaCatador() {
               type="submit"
               className="w-25 mx-2 btn-orange"
               onClick={handleDownloadPDF}
+              disabled={!startDate || !endDate }
+
             >
               <BsDownload /> Baixar
             </Button>

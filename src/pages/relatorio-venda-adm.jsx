@@ -33,6 +33,7 @@ function RelatorioVendaAdm() {
   const navigate = useNavigate();
   const location = useLocation();
   const vendas = location.state?.vendas || [];
+  const associacaoInfo = location.state.associacaoInfo || {};
   const dataInicialParam = location.state?.startDate || "";
   const dataFinalParam = location.state?.endDate || "";
 
@@ -68,6 +69,24 @@ function RelatorioVendaAdm() {
 
   const handleGoBack = () => {
     navigate(-1);
+  };
+
+
+  const fetchAssociacaoInfo = async (idAssociacao) => {
+    try {
+      const response = await API.get(`/associacoes/${idAssociacao}`, config);
+      return {
+        associacaoName: response.data.user.name,
+
+      };
+    } catch (error) {
+      console.error("Erro ao obter informações do associacao:", error);
+      return {
+
+        associacaoName: "Nome da Associacão Não Disponível",
+
+      };
+    }
   };
 
   const fetchAssociacaoName = async (idAssociacao) => {
@@ -109,6 +128,18 @@ function RelatorioVendaAdm() {
       });
 
       setMateriaisVendidos(Object.values(materiais));
+
+
+
+      if (associacaoInfo && associacaoInfo.id) {
+        const fetchAssociacaoDetails = async () => {
+          const { associacaoName } = await fetchAssociacaoInfo(associacaoInfo.id);
+
+          setAssociacaoName(associacaoName);
+        };
+
+        fetchAssociacaoDetails();
+      }
     };
 
     processarDados();
@@ -196,16 +227,36 @@ function RelatorioVendaAdm() {
               Quantidade comercializada por material:
             </Form.Label>
             {materiaisVendidos.map((material, index) => (
-              <Form.Control
-                key={index}
-                type="text"
-                className="form-control custom-focus"
-                value={`${material.pesoTotal} kg`}
-                placeholder="0 kg"
-                aria-label="Disabled input exampl"
-                disabled
-              />
+              <div key={index} className="d-flex align-items-center">
+                <Form.Control
+                  type="text"
+                  className="form-control custom-focus w-100"
+                  value={material.nome}
+                  aria-label="Disabled input example"
+                  disabled
+                />
+                <BsCaretRightFill className="ml-2 text-orange" />
+                <Form.Control
+                  type="text"
+                  className="form-control custom-focus"
+                  value={`${material.pesoTotal || "0"} kg`}
+                  placeholder="0 kg"
+                  aria-label="Disabled input exampl"
+                  disabled
+                />
+              </div>
             ))}
+            {materiaisVendidos.length === 0 && (
+              <div className="d-flex align-items-center">
+                <Form.Control
+                  type="text"
+                  className="form-control custom-focus w-100"
+                  value="Nenhum material vendido"
+                  aria-label="Disabled input example"
+                  disabled
+                />
+              </div>
+            )}
             <Form.Label className="text-orange">
               Quantidade de materiais vendidos no período:
             </Form.Label>
@@ -213,7 +264,7 @@ function RelatorioVendaAdm() {
               type="text"
               className="form-control custom-focus"
               style={{ width: "120px" }}
-              value={`${quantidadeMateriaisVendidosNoPeriodo} kg`}
+              value={`${quantidadeMateriaisVendidosNoPeriodo || "0"} kg`}
               aria-label="Disabled input example"
               disabled
             />

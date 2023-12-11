@@ -72,12 +72,10 @@ const AdicionarCatador = (props) => {
     fetchData("/funcoes-catador", setFuncoes);
   }, []);
 
-  const handleAssociacaoChange = (event) => {
-    const associacao = associacoes.find(
-      (a) => a.user.name === event.target.innerText
-    );
-    setSelectedAssociacao(associacao ? associacao.id : "");
-    setVisualSelectedAssociacao(associacao ? associacao.user.name : "");
+  const handleassociacaoChange = ({ id, user: { name } }) => {
+  
+    setSelectedAssociacao(id);
+    setVisualSelectedAssociacao(name);
   };
 
   const handleEtniaChange = (event) => {
@@ -215,23 +213,24 @@ const AdicionarCatador = (props) => {
           />
 
           {/* Adicione este código dentro do componente Modal.Body */}
-          <FormGroup controlId="associacaoDropdown">
             <Form.Label className="text-orange">
               Selecione a Associação
             </Form.Label>
-            <Form.Control
-              as="select"
-              value={selectedAssociacao}
-              onChange={(e) => setSelectedAssociacao(e.target.value)}
-            >
-              <option value="">Selecione uma associação</option>
-              {associacoes.map((associacao) => (
-                <option key={associacao.id} value={associacao.id}>
-                  {associacao.name}
-                </option>
-              ))}
-            </Form.Control>
-          </FormGroup>
+            <Dropdown className="w-100">
+                <Dropdown.Toggle
+                  className="w-100 outline-white"
+                  id="dropdown-basic"
+                >
+                  {visualSelectedAssociacao || "Selecione uma Associacao"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="w-100">
+                  {associacoes.map((associacao, index) => (
+                    <Dropdown.Item key={associacao.id} onClick={() => handleassociacaoChange(associacao)}>
+                      {associacao.user.name}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
 
           <Form.Label className="text-orange">Etnia</Form.Label>
           <Dropdown className="w-100">
@@ -421,7 +420,6 @@ function EditarCatador(props) {
           console.log("Catador atualizado com sucesso:", response.data);
           toast.success("Catador atualizado com sucesso");
           props.onHide();
-
           setCatador(response.data);
           window.location.reload();
           console.log("Após a atualização do estado catador:", catador);
@@ -582,7 +580,7 @@ function EditarCatador(props) {
 function ListarCatadores() {
   const [catadorData, setCatadorData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [catadorSelecionadoId, setCatadorSelecionadoId] = useState(null); // Adicionando estado para o ID do catador selecionado
+  const [catadorSelecionadoId, setCatadorSelecionadoId] = useState(null); 
   const [modalAdicionarShow, setModalAdicionarShow] = useState(false);
   const [modalEditarShow, setModalEditarShow] = useState(false);
   const [showConfirmacaoModal, setShowConfirmacaoModal] = useState(false);
@@ -601,7 +599,6 @@ function ListarCatadores() {
           setCatadorData((prevCatadores) =>
             prevCatadores.filter((catador) => catador.id !== catadorId)
           );
-          // Atualizar a lista de catadores após a exclusão (pode ser necessário recarregar a página ou obter novamente os dados)
         } else {
           console.error("Resposta inválida ao excluir catador:", response);
           toast.error(
@@ -734,22 +731,12 @@ function ListarCatadores() {
           md={12}
           className="d-flex align-items-center justify-content-center"
         >
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            ADMINISTRADOR
-          </Button>
+          
           <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
             <BsPeopleFill size={20} className="m-2" />
             CATADOR
           </Button>
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            ASSOCIAÇÃO
-          </Button>
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            OP. LOGÍSTICO
-          </Button>
+         
         </Col>
         <hr className="m-4" />
         <Col

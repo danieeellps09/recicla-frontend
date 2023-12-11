@@ -14,10 +14,10 @@ function Header() {
     const access_token = localStorage.getItem("token");
     const decodedToken = jwtDecode(access_token);
     roleNames = decodedToken.roleNames;
-    userName = decodedToken.name.split(' ')[0]; // Extrai o primeiro nome
+    userName = decodedToken.name.split(' ')[0]; 
 
     const handleInicioClick = () => {
-        navigate(`/perfil-${roleNames}`); // Ajuste a rota de início de acordo com a sua aplicação
+        navigate(`/perfil-${roleNames}`); 
     };
 
     const handleUsuarioClick = () => {
@@ -25,8 +25,7 @@ function Header() {
     };
 
     const handleSairClick = () => {
-        // Lógica para fazer logout ou limpar dados de autenticação, se necessário
-        localStorage.removeItem("token"); // Remova o token do localStorage
+        localStorage.removeItem("token"); 
         navigate('/');
     };
 

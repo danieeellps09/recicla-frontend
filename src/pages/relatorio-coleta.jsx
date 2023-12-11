@@ -19,6 +19,7 @@ import {
 import { Autenticacao } from "../config/Autenticacao";
 import { useLocation, useNavigate } from "react-router-dom";
 import { API } from "../services/api";
+import axios from "axios";
 
 function RelatorioColeta() {
   const [catadorName, setCatadorName] = useState("");
@@ -55,6 +56,20 @@ function RelatorioColeta() {
       console.error("Erro ao obter nome do catador:", error);
     }
   };
+
+
+  const fetchCurrentUser = async () => {
+  try {
+    const response = await axios.get("http://3.129.19.7:3000/current_user", config);
+    console.log(response)
+    const catadorName = response.data.name ;
+
+    return catadorName;
+  } catch (error) {
+    console.error("Erro ao obter informações do usuário:", error);
+    return "Nome do Catador Não Disponível";
+  }
+};
 
   const fetchAssociacaoName = async (idAssociacao) => {
     try {
@@ -136,8 +151,17 @@ function RelatorioColeta() {
 
       console.log("coletas dentro do useEffect:", coletas);
       console.log("useEffect em RelatorioColeta foi chamado.");
+    } else {
+      const loadCurrentUser = async () => {
+        const catadorName = await fetchCurrentUser();
+        setCatadorName(catadorName);
+      };
+  
+      loadCurrentUser();
     }
-  }, [coletas]);
+
+
+  }, []);
   const handleDownloadPDF = async () => {
     try {
       const downloadURL = `/pdf/coleta/${idCatador}?completo=${completo}&datainicio=${formatarData(
@@ -230,15 +254,37 @@ function RelatorioColeta() {
 
           <Col>
             <Form.Label className="text-orange">
-              Quantidade de residíduos coletados:{" "}
+              Quantidade de residuos coletados:{" "}
             </Form.Label>
-            {coletas.map((coleta, index) => (
-              <div key={index} className="d-flex align-items-center">
+            {coletas.length > 0 ? (
+              coletas.map((coleta, index) => (
+                <div key={index} className="d-flex align-items-center">
+                  <Form.Control
+                    type="text"
+                    className="form-control custom-focus"
+                    style={{ width: "100px" }}
+                    value={`${coleta.quantidade} kg`}
+                    aria-label="Disabled input example"
+                    disabled
+                  />
+                  <span className="mx-2">em</span>
+                  <Form.Control
+                    type="text"
+                    className="form-control custom-focus"
+                    style={{ width: "150px" }}
+                    value={formatarData(coleta.dataColeta)}
+                    aria-label="Disabled input example"
+                    disabled
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="d-flex align-items-center">
                 <Form.Control
                   type="text"
                   className="form-control custom-focus"
                   style={{ width: "100px" }}
-                  value={`${coleta.quantidade} kg`}
+                  value="0 kg"
                   aria-label="Disabled input example"
                   disabled
                 />
@@ -247,12 +293,29 @@ function RelatorioColeta() {
                   type="text"
                   className="form-control custom-focus"
                   style={{ width: "150px" }}
-                  value={formatarData(coleta.dataColeta)}
+                  value={formatarData(new Date())} 
                   aria-label="Disabled input example"
                   disabled
                 />
               </div>
-            ))}
+            )}
+          </Col>
+
+        </Row>
+        <Row className="w-100 my-1">
+          <Col>
+            {/* Novo campo para mostrar a quantidade de rotas realizadas */}
+            <Form.Label className="w-100 text-orange">
+              Rotas totais realizadas em todos os pontos:
+            </Form.Label>
+            <Form.Control
+              type="text"
+              className="form-control custom-focus"
+              style={{ width: "150px" }}
+              value={rotasRealizadas}
+              aria-label="Disabled input exampl"
+              disabled
+            />
           </Col>
         </Row>
         <Row className="w-100 my-1">

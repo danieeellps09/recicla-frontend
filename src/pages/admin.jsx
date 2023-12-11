@@ -87,7 +87,7 @@ function Admin() {
           <div>
             <h5 className="text-center mb-3">
               Você está acessando como
-              <span style={{ color: "#EF7A2A" }}>ADMINISTRADOR</span> da
+              <span style={{ color: "#EF7A2A" }}> ADMINISTRADOR</span> da
               plataforma.
             </h5>
             {/* TODO: CODIGO COMENTADO */}

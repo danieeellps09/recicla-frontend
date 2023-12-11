@@ -193,16 +193,36 @@ function RelatorioVenda() {
               Quantidade comercializada por material:
             </Form.Label>
             {materiaisVendidos.map((material, index) => (
-              <Form.Control
-                key={index}
-                type="text"
-                className="form-control custom-focus"
-                value={`${material.pesoTotal} kg`}
-                placeholder="0 kg"
-                aria-label="Disabled input exampl"
-                disabled
-              />
+              <div key={index} className="d-flex align-items-center">
+                <Form.Control
+                  type="text"
+                  className="form-control custom-focus w-100"
+                  value={material.nome}
+                  aria-label="Disabled input example"
+                  disabled
+                />
+                <BsCaretRightFill className="ml-2 text-orange" />
+                <Form.Control
+                  type="text"
+                  className="form-control custom-focus"
+                  value={`${material.pesoTotal || "0"} kg`}
+                  placeholder="0 kg"
+                  aria-label="Disabled input exampl"
+                  disabled
+                />
+              </div>
             ))}
+            {materiaisVendidos.length === 0 && (
+              <div className="d-flex align-items-center">
+                <Form.Control
+                  type="text"
+                  className="form-control custom-focus w-100"
+                  value="Nenhum material vendido"
+                  aria-label="Disabled input example"
+                  disabled
+                />
+              </div>
+            )}
             <Form.Label className="text-orange">
               Quantidade de materiais vendidos no período:
             </Form.Label>
@@ -210,7 +230,7 @@ function RelatorioVenda() {
               type="text"
               className="form-control custom-focus"
               style={{ width: "120px" }}
-              value={`${quantidadeMateriaisVendidosNoPeriodo} kg`}
+              value={`${quantidadeMateriaisVendidosNoPeriodo || "0"} kg`}
               aria-label="Disabled input example"
               disabled
             />

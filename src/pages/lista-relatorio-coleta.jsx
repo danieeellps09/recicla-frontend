@@ -4,6 +4,8 @@ import { BsArrowLeftShort, BsDownload, BsEyeFill } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Autenticacao } from "../config/Autenticacao";
 import { API } from "../services/api";
+import * as XLSX from "xlsx";
+
 
 function ListaRelatorioColeta() {
   const [startDate, setStartDate] = useState("");
@@ -14,7 +16,6 @@ function ListaRelatorioColeta() {
   const [visualSelectedCatador, setVisualSelectedCatador] = useState("");
   const [idCatador, setIdCatador] = useState("");
 
-  // Função para carregar a lista de catadores
   const autenticacao = Autenticacao();
   const token = autenticacao.token;
 
@@ -80,7 +81,6 @@ function ListaRelatorioColeta() {
   };
 
   const handlecatadorChange = ({ id, user: { name } }) => {
-    //TODO: REMOVI OS TERNARIOS, POIS CREIO QUE O ID E O NAME SEMPRE IRA VIR NA REQUISICAO
     setSelectedCatador(id);
     setVisualSelectedCatador(name);
   };
@@ -98,7 +98,6 @@ function ListaRelatorioColeta() {
 
   const handleClick = async () => {
     try {
-      console.log(`${selectedCatador}`);
       const response = await API.get(
         `/forms/coleta/findBetweenDates/${selectedCatador}`,
         {
@@ -109,11 +108,14 @@ function ListaRelatorioColeta() {
         }
       );
       setColetas(response.data);
+      const selectedCatadorInfo = catadores.find(catador => catador.id === selectedCatador);
+
       navigate("/relatorio-coleta-adm", {
         state: {
           coletas: response.data,
           startDate: startDate,
           endDate: endDate,
+          catadorInfo: selectedCatadorInfo
         },
       });
     } catch (error) {
@@ -150,6 +152,29 @@ function ListaRelatorioColeta() {
     }
   };
 
+  const handleExportToXLSX = () => {
+    try {
+      const worksheet = XLSX.utils.json_to_sheet(coletas);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Coletas");
+
+      const blob = XLSX.write(workbook, { bookType: "xlsx", type: "blob" });
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "coletas.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Erro ao exportar para XLSX:", error);
+    }
+  };
+
+
+
+
   return (
     <>
       <Container
@@ -173,9 +198,7 @@ function ListaRelatorioColeta() {
                 <Dropdown.Menu className="w-100">
                   {catadores.map((catador, index) => (
                     <Dropdown.Item
-                      key={catador.id} //TODO: SEMPRE USE IDENTIFICADORES NA KEY UNICOS COMO: 'IDS', USE O INDEX
-                      //APENAS EM ULTIMO CASO, PQ NÃO É UMA BOA PRATICA,
-                      //JA QUE AS VEZES O REACT PODE PERDER REFERENCIA
+                      key={catador.id}
                       onClick={() => handlecatadorChange(catador)}
                     >
                       {catador.user.name}
@@ -218,6 +241,7 @@ function ListaRelatorioColeta() {
                 className="custom-focus"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
+                required
               />
             </Col>
             <Col className="p-0 ms-3">
@@ -227,6 +251,7 @@ function ListaRelatorioColeta() {
                 className="custom-focus"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+                required
               />
             </Col>
           </Row>
@@ -238,6 +263,8 @@ function ListaRelatorioColeta() {
               type="submit"
               className="w-25 mx-2 btn-orange"
               onClick={handleClick}
+              disabled={!startDate || !endDate || !selectedCatador}
+              required
             >
               <BsEyeFill /> Visualizar
             </Button>
@@ -245,9 +272,12 @@ function ListaRelatorioColeta() {
               type="submit"
               className="w-25 mx-2 btn-orange"
               onClick={handleDownloadPDF}
+              disabled={!startDate || !endDate || !selectedCatador}
+
             >
               <BsDownload /> Baixar
             </Button>
+          
             <Button
               type="submit"
               className="w-25 mx-2 outline-white "

@@ -87,12 +87,10 @@ function ListaRelatorioVendaAssociacao() {
     return `${year}-${month}-${day}`;
   };
 
-  const handleassociacaoChange = (event) => {
-    const associacao = associacoes.find(
-      (a) => a.user.name === event.target.innerText
-    );
-    setSelectedAssociacao(associacao ? associacao.id : "");
-    setVisualSelectedAssociacao(associacao ? associacao.user.name : "");
+  const handleassociacaoChange = ({ id, user: { name } }) => {
+  
+    setSelectedAssociacao(id);
+    setVisualSelectedAssociacao(name);
   };
 
   useEffect(() => {
@@ -125,12 +123,14 @@ function ListaRelatorioVendaAssociacao() {
       console.log("Após a solicitação com sucesso");
       setVendas(response.data);
       console.log("venda antes de renderizar RelatorioColeta:", response.data);
+      const selectedAssociacaoInfo = associacoes.find(associacao => associacao.id === selectedAssociacao);
 
       navigate("/relatorio-venda-adm", {
         state: {
           vendas: response.data,
           startDate: startDate,
           endDate: endDate,
+          associacaoInfo: selectedAssociacaoInfo
         },
       });
     } catch (error) {
@@ -189,7 +189,7 @@ function ListaRelatorioVendaAssociacao() {
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="w-100">
                   {associacoes.map((associacao, index) => (
-                    <Dropdown.Item key={index} onClick={handleassociacaoChange}>
+                    <Dropdown.Item key={associacao.id} onClick={() => handleassociacaoChange(associacao)}>
                       {associacao.user.name}
                     </Dropdown.Item>
                   ))}
@@ -246,6 +246,8 @@ function ListaRelatorioVendaAssociacao() {
             <Button
               type="submit"
               className="w-25 mx-2 btn-orange"
+              disabled={!startDate || !endDate || !selectedAssociacao}
+
               onClick={handleClick}
             >
               <BsEyeFill /> Visualizar
@@ -255,6 +257,8 @@ function ListaRelatorioVendaAssociacao() {
               type="submit"
               className="w-25 mx-2 btn-orange"
               onClick={handleDownloadPDF}
+              disabled={!startDate || !endDate || !selectedAssociacao}
+
             >
               <BsDownload /> Baixar
             </Button>

@@ -19,6 +19,12 @@ import {
 import { Autenticacao } from "../config/Autenticacao";
 import { useLocation, useNavigate } from "react-router-dom";
 import { API } from "../services/api";
+import ResumoColeta from "../models/resumoColetas";
+import * as XLSX from "xlsx";
+import html2pdf from 'html2pdf.js';
+
+import { saveAs } from 'file-saver';
+
 
 function RelatorioColetaAdm() {
   const [catadorName, setCatadorName] = useState("");
@@ -35,6 +41,9 @@ function RelatorioColetaAdm() {
 
   const location = useLocation();
   const coletas = location.state?.coletas || [];
+  const catadorInfo = location.state.catadorInfo || {};
+
+
   const dataInicialParam = location.state?.startDate || "";
   const dataFinalParam = location.state?.endDate || "";
 
@@ -46,11 +55,33 @@ function RelatorioColetaAdm() {
       Authorization: `Bearer ${token}`,
     },
   };
+
+
+  const fetchCatadorInfo = async (idCatador) => {
+    try {
+      const response = await API.get(`/catadores/${idCatador}`, config);
+      return {
+        catadorName: response.data.user.name,
+        funcaoName: response.data.funcoescatador.funcao,
+        associacaoName: response.data.associacao.user.name
+      };
+    } catch (error) {
+      console.error("Erro ao obter informações do catador:", error);
+      return {
+        catadorName: "Nome do Catador Não Disponível",
+        funcaoName: "Função do Catador Não Disponível",
+        associacaoName: "Função do Catador Não Disponível",
+
+      };
+    }
+  };
+
   const fetchCatadorName = async (idCatador) => {
     try {
       const response = await API.get(`/catadores/${idCatador}`, config);
       setCatadorName(response.data.user.name);
       setFuncaoName(response.data.funcoescatador.funcao);
+
     } catch (error) {
       console.error("Erro ao obter nome do catador:", error);
     }
@@ -80,7 +111,6 @@ function RelatorioColetaAdm() {
 
   const calcularRotasRealizadas = (coletas) => {
     return coletas.reduce((total, coleta) => {
-      // Se a coleta foi realizada em todos os pontos (pergunta === true), incrementa o total
       return coleta.pergunta ? total + 1 : total;
     }, 0);
   };
@@ -117,38 +147,251 @@ function RelatorioColetaAdm() {
   };
 
   useEffect(() => {
-    if (coletas && coletas.length > 0) {
-      coletas.forEach((coleta) => {
-        setIdCatador(coleta.idCatador);
-        fetchCatadorName(coleta.idCatador);
-        fetchAssociacaoName(coleta.idAssociacao);
-        fetchVeiculoInfo(coleta.idVeiculo);
-      });
+    const fetchData = async () => {
+      try {
+        if (coletas && coletas.length > 0) {
+          coletas.forEach((coleta) => {
 
-      const total = calcularQuantidadeTotal(coletas);
-      setQuantidadeTotal(total);
+            setIdCatador(coleta.idCatador)
+            fetchCatadorName(coleta.idCatador);
+            fetchAssociacaoName(coleta.idAssociacao);
+            fetchVeiculoInfo(coleta.idVeiculo);
+          });
 
-      const rotasTotais = calcularRotasTotais(coletas);
-      setRotasTotais(rotasTotais);
+          const total = calcularQuantidadeTotal(coletas);
+          setQuantidadeTotal(total);
 
-      const rotasRealizadasCount = calcularRotasRealizadas(coletas);
-      setRotasRealizadas(rotasRealizadasCount);
+          const rotasTotais = calcularRotasTotais(coletas);
+          setRotasTotais(rotasTotais);
 
-      console.log("coletas dentro do useEffect:", coletas);
-      console.log("useEffect em RelatorioColeta foi chamado.");
-    }
-  }, [coletas]);
-  const handleDownloadPDF = async () => {
+          const rotasRealizadasCount = calcularRotasRealizadas(coletas);
+          setRotasRealizadas(rotasRealizadasCount);
+
+          console.log("coletas dentro do useEffect:", coletas);
+          console.log("useEffect em RelatorioColeta foi chamado.");
+        } else if (catadorInfo && catadorInfo.id) {
+          const fetchCatadorDetails = async () => {
+            const { catadorName, funcaoName, associacaoName } = await fetchCatadorInfo(catadorInfo.id);
+            setCatadorName(catadorName);
+            setFuncaoName(funcaoName);
+            setAssociacaoName(associacaoName);
+          };
+
+          fetchCatadorDetails();
+        }
+      } catch (error) {
+        console.error("Erro ao obter informações:", error);
+      }
+    };
+
+    fetchData();
+  }, [idCatador, coletas]);
+
+
+
+  // const handleDownloadPDF = async () => {
+  //   try {
+  //     const downloadURL = `/pdf/coleta/${idCatador}?completo=${completo}&datainicio=${formatarData(
+  //       dataInicialParam
+  //     )}&datafim=${formatarData(dataFinalParam)}`;
+
+  //     window.open(downloadURL, "_blank");
+  //   } catch (error) {
+  //     console.error("Erro ao baixar o relatório:", error);
+  //   }
+  // };
+
+  // Fun
+
+  //
+
+  const handleDownloadPDF = () => {
     try {
-      const downloadURL = `/pdf/coleta/${idCatador}?completo=${completo}&datainicio=${formatarData(
-        dataInicialParam
-      )}&datafim=${formatarData(dataFinalParam)}`;
 
-      window.open(downloadURL, "_blank");
+      const resumoColetas = new ResumoColeta(coletas);
+      const pdfContent = formatarColetasFrontend({
+        coletas,
+        catadorInfo,
+        startDate: formatarData(dataInicialParam),
+        endDate: formatarData(dataFinalParam),
+        resumoColetas,
+      }, completo);
+
+      const pdfOptions = {
+        margin: 10,
+        filename: 'relatorio.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      };
+
+      html2pdf().from(pdfContent).set(pdfOptions).outputPdf((pdf) => {
+        const blob = new Blob([pdf], { type: 'application/pdf' });
+        saveAs(blob, 'relatorio.pdf');
+      });
     } catch (error) {
-      console.error("Erro ao baixar o relatório:", error);
+      console.error('Erro ao baixar o relatório:', error);
     }
   };
+
+
+
+  const formatarColetasFrontend = ({ coletas, catador, startDate, endDate, resumoColetas }, completo) => {
+    // Sua lógica de estilos aqui
+    const style = `<style type="text/css">
+  *{
+      margin:0;
+      padding: 0;
+  }
+  html {
+    -webkit-print-color-adjust: exact;
+  }
+  body {
+      font-family: sans-serif;
+      padding: 0 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  }
+
+  #container-logo{
+    height: 40px;
+    padding: 30px;
+    min-width: 10px;
+    background-color: #E1621E;
+    border-radius: 30px;
+    margin-bottom: 30px;
+  }
+
+  #container-logo img{
+    height: 100%;
+  }
+
+  h1, h2, h3 {
+      text-transform: uppercase;
+      color: #E1621E;
+      text-align: center;
+      margin-bottom: 30px;
+      width: 100%;
+  }
+
+  .container {
+      border:#E1621E 2px solid;
+      border-radius: 30px;
+      padding: 20px 30px;
+      width:100%;
+      margin-bottom: 50px;
+
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+  }
+
+  p{
+      color:rgb(95, 95, 95);
+      font-size: 20px;
+      margin-bottom: 10px;
+      width: 100%;
+      font-display: inherit;
+  }
+
+  .linha{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+      width: 100%;
+  }
+
+  .linha p{
+      width:50%;
+      font-size: 20px;
+  }
+
+  .margin-top{
+    margin-top: 30px;
+  }
+
+  ul{
+    margin-left: 20px;
+    color: #E1621E;
+    font-size: 30px;
+  }
+</style>`;
+
+console.log("entrou aqui tb")
+
+    const catadorInfo = coletas.idCatador != null ? `
+<div class="container">
+  <h2>Dados de catador</h2>
+  <div class="linha">
+    <p><b>Catador</b>: ${catador.user.name}</p>
+    <p><b>CPF</b>: ${catador.cpf}</p>
+  </div>
+  <div class="linha">
+    <p><b>Bairro</b>: ${catador.bairro}</p>
+    <p><b>Endereço</b>: ${catador.endereco}</p>
+  </div>
+</div>` : "";
+
+
+   const resumo = `
+<div class="container"> 
+  <h2>Resumo da Coleta</h2>
+  <p><b>Datas</b>: ${startDate} - ${endDate}</p>
+  <p><b>Quantidade de coletas realizadas</b>: ${resumoColetas.quantidadeColetas}</p>
+  <p><b>Quantidade de resíduos coletados</b>: ${resumoColetas.quantidadeColetada} kg</p>
+</div>`;
+
+    if (completo) {
+      main += "<h2>Coletas realizadas:</h2>";
+      for (let coleta of coletas) {
+        const coletaFormatada = `
+    <div class = "container">
+      ${coleta.idCatador != null ? "" : `
+        <p><b>Nome do catador</b>: ${catador.user.name}</p>
+        <p><b>Cpf do catador</b>: ${catador.cpf}</p>
+      `}
+      <p><b>Nome do associacao</b>: ${catador.associacao.user.name}</p>
+      <p><b>CNPJ da associacao</b>: ${catador.associacao.cnpj}</p>
+      <p><b>Data</b>: ${formatarData(coleta.dataColeta)}</p>
+      <p><b>Veículo utilizado</b>: ${veiculosUtilizados.map((veiculo, index) => (
+
+           { veiculo }
+
+        ))}</p>
+      <p><b>Quantidade de resíduos coletados</b>: ${coleta.quantidade} kg</p>
+      <p><b>Todos os pontos coletados</b>: ${coleta.pergunta ? 'Sim' : 'Não'}</p>
+      <p><b>Motivo</b>: ${coleta.motivo == null || coleta.motivo == "" ? '--' : coleta.motivo}</p>
+    </div>`;
+        main += coletaFormatada;
+      }
+    }
+
+
+
+    let main = "";
+    const conteudoPDF = `
+    <html>
+      <head>
+        ${style}
+      </head>
+      <body>
+        <div id="container-logo">
+          <img src="https://drive.google.com/uc?export=download&id=16E44t6GPW24wkxOBbLIiag1LJptWokk1" alt="">
+        </div>
+        ${catadorInfo}
+        ${resumo}
+        ${main}
+      </body>
+    </html>
+  `;
+
+    return conteudoPDF;
+  };
+
+
+
+
   return (
     <>
       <Container
@@ -230,15 +473,37 @@ function RelatorioColetaAdm() {
 
           <Col>
             <Form.Label className="text-orange">
-              Quantidade de residíduos coletados:{" "}
+              Quantidade de residuos coletados:{" "}
             </Form.Label>
-            {coletas.map((coleta, index) => (
-              <div key={index} className="d-flex align-items-center">
+            {coletas.length > 0 ? (
+              coletas.map((coleta, index) => (
+                <div key={index} className="d-flex align-items-center">
+                  <Form.Control
+                    type="text"
+                    className="form-control custom-focus"
+                    style={{ width: "100px" }}
+                    value={`${coleta.quantidade} kg`}
+                    aria-label="Disabled input example"
+                    disabled
+                  />
+                  <span className="mx-2">em</span>
+                  <Form.Control
+                    type="text"
+                    className="form-control custom-focus"
+                    style={{ width: "150px" }}
+                    value={formatarData(coleta.dataColeta)}
+                    aria-label="Disabled input example"
+                    disabled
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="d-flex align-items-center">
                 <Form.Control
                   type="text"
                   className="form-control custom-focus"
                   style={{ width: "100px" }}
-                  value={`${coleta.quantidade} kg`}
+                  value="0 kg"
                   aria-label="Disabled input example"
                   disabled
                 />
@@ -247,13 +512,14 @@ function RelatorioColetaAdm() {
                   type="text"
                   className="form-control custom-focus"
                   style={{ width: "150px" }}
-                  value={formatarData(coleta.dataColeta)}
+                  value={formatarData(new Date())}
                   aria-label="Disabled input example"
                   disabled
                 />
               </div>
-            ))}
+            )}
           </Col>
+
         </Row>
         <Row className="w-100 my-1">
           <Col>
@@ -294,9 +560,9 @@ function RelatorioColetaAdm() {
               Quantidade total coletado
             </Form.Label>
             <Form.Control
-              type="text" // Alterado o tipo para texto
+              type="text"
               className="form-control custom-focus"
-              value={`${quantidadeTotal} kg`} // Adicionado " kg" ao valor
+              value={`${quantidadeTotal} kg`}
               aria-label="Disabled input exampl"
               disabled
             />
@@ -309,6 +575,7 @@ function RelatorioColetaAdm() {
             >
               <BsDownload /> Baixar
             </Button>
+
             <Button
               type="submit"
               className="w-25 mx-2 outline-white"

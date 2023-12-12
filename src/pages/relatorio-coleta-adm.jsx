@@ -22,6 +22,7 @@ import { API } from "../services/api";
 import ResumoColeta from "../models/resumoColetas";
 import * as XLSX from "xlsx";
 import html2pdf from 'html2pdf.js';
+import jsPDF from 'jspdf';
 
 import { saveAs } from 'file-saver';
 
@@ -37,7 +38,9 @@ function RelatorioColetaAdm() {
   const [veiculosUtilizados, setVeiculosUtilizados] = useState([]);
   const [rotasRealizadas, setRotasRealizadas] = useState(0);
   const [idCatador, setIdCatador] = useState("");
-  const [completo, setCompleto] = useState(false);
+  const [cnpj, setCnpj] = useState("");
+  const [cpf, setCatadorCpf] = useState("")
+  const [completo, setCompleto] = useState(true);
 
   const location = useLocation();
   const coletas = location.state?.coletas || [];
@@ -63,7 +66,10 @@ function RelatorioColetaAdm() {
       return {
         catadorName: response.data.user.name,
         funcaoName: response.data.funcoescatador.funcao,
-        associacaoName: response.data.associacao.user.name
+        associacaoName: response.data.associacao.user.name,
+        cpfCatador: response.data.user.cpf,
+        endereco: response.data.endereco,
+        bairro: response.data.bairro
       };
     } catch (error) {
       console.error("Erro ao obter informações do catador:", error);
@@ -80,7 +86,9 @@ function RelatorioColetaAdm() {
     try {
       const response = await API.get(`/catadores/${idCatador}`, config);
       setCatadorName(response.data.user.name);
+      setCatadorCpf(response.data.user.cpf)
       setFuncaoName(response.data.funcoescatador.funcao);
+
 
     } catch (error) {
       console.error("Erro ao obter nome do catador:", error);
@@ -90,9 +98,16 @@ function RelatorioColetaAdm() {
   const fetchAssociacaoName = async (idAssociacao) => {
     try {
       const response = await API.get(`/associacoes/${idAssociacao}`, config);
+      const associacaoData = {
+        name: response.data.user.name,
+        cnpj: response.data.cnpj
+      };
       setAssociacaoName(response.data.user.name);
+      setCnpj(response.data.cnpj)
+      return associacaoData
     } catch (error) {
       console.error("Erro ao obter nome do associacao:", error);
+      return null
     }
   };
   const fetchVeiculoInfo = async (veiculoId) => {
@@ -170,12 +185,14 @@ function RelatorioColetaAdm() {
           console.log("coletas dentro do useEffect:", coletas);
           console.log("useEffect em RelatorioColeta foi chamado.");
         } else if (catadorInfo && catadorInfo.id) {
+
           const fetchCatadorDetails = async () => {
             const { catadorName, funcaoName, associacaoName } = await fetchCatadorInfo(catadorInfo.id);
             setCatadorName(catadorName);
             setFuncaoName(funcaoName);
             setAssociacaoName(associacaoName);
           };
+
 
           fetchCatadorDetails();
         }
@@ -205,17 +222,56 @@ function RelatorioColetaAdm() {
 
   //
 
-  const handleDownloadPDF = () => {
+
+
+
+
+  const testarGeracaoPDF = () => {
+    const pdf = new jsPDF();
+    pdf.text('Teste de PDF', 10, 10);
+
+    try {
+      pdf.save('teste.pdf');
+    } catch (error) {
+      console.error('Erro durante a geração do PDF:', error);
+    }
+  };
+
+
+
+  const handleDownloadPDF = async () => {
     try {
 
-      const resumoColetas = new ResumoColeta(coletas);
-      const pdfContent = formatarColetasFrontend({
-        coletas,
-        catadorInfo,
-        startDate: formatarData(dataInicialParam),
-        endDate: formatarData(dataFinalParam),
-        resumoColetas,
-      }, completo);
+      if (!catadorInfo || !catadorInfo.id) {
+        console.error('Informações do catador não disponíveis.');
+        return;
+      }
+
+
+      const catadorDetails = await fetchCatadorInfo(catadorInfo.id);
+      console.log('catadorDetails', catadorDetails)
+      const coletasData = await Promise.all(coletas.map(async (coleta) => {
+        const associacaoData = await fetchAssociacaoName(coleta.idAssociacao);
+        const veiculoData = await fetchVeiculoInfo(coleta.idVeiculo);
+
+        return {
+          ...coleta,
+          catadorData: catadorDetails,
+          associacaoData,
+          veiculoData,
+        };
+      }));
+
+      const resumoColetas = new ResumoColeta(coletasData);
+
+      // const pdfContent = formatarColetasFrontend({
+      //   coletas: coletasData,
+      //   catador: catadorDetails,
+      //   startDate: formatarData(dataInicialParam),
+      //   endDate: formatarData(dataFinalParam),
+      //   resumoColetas,
+      // }, completo);
+
 
       const pdfOptions = {
         margin: 10,
@@ -225,18 +281,34 @@ function RelatorioColetaAdm() {
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       };
 
-      html2pdf().from(pdfContent).set(pdfOptions).outputPdf((pdf) => {
-        const blob = new Blob([pdf], { type: 'application/pdf' });
-        saveAs(blob, 'relatorio.pdf');
-      });
-    } catch (error) {
+      console.log('Antes de html2pdf');
+
+      const pdfContentPromise = formatarColetasFrontend({
+        coletas: coletasData,
+        catador: catadorDetails,
+        startDate: formatarData(dataInicialParam),
+        endDate: formatarData(dataFinalParam),
+        resumoColetas,
+    }, completo);
+
+    console.log('Antes de html2pdf');
+
+    pdfContentPromise.then(resolvedContent => {
+        const element = document.createElement('div');
+        element.innerHTML = resolvedContent;
+
+        html2pdf(element, pdfOptions);
+    }).catch(error => {
+        console.error('Erro durante a geração do PDF:', error);
+    });
+     } catch (error) {
       console.error('Erro ao baixar o relatório:', error);
     }
   };
 
 
 
-  const formatarColetasFrontend = ({ coletas, catador, startDate, endDate, resumoColetas }, completo) => {
+  const formatarColetasFrontend = async ({ coletas, catador, startDate, endDate, resumoColetas }, completo) => {
     // Sua lógica de estilos aqui
     const style = `<style type="text/css">
   *{
@@ -318,13 +390,14 @@ function RelatorioColetaAdm() {
   }
 </style>`;
 
-console.log("entrou aqui tb")
+    console.log("dados coleta: ", coletas, catador, startDate, endDate, resumoColetas, completo)
 
-    const catadorInfo = coletas.idCatador != null ? `
+
+ const catadorInfo = coletas.idCatador != null ? `
 <div class="container">
   <h2>Dados de catador</h2>
   <div class="linha">
-    <p><b>Catador</b>: ${catador.user.name}</p>
+    <p><b>Catador</b>: ${catador.catadorName}</p>
     <p><b>CPF</b>: ${catador.cpf}</p>
   </div>
   <div class="linha">
@@ -334,42 +407,54 @@ console.log("entrou aqui tb")
 </div>` : "";
 
 
-   const resumo = `
+    const resumo = `
 <div class="container"> 
   <h2>Resumo da Coleta</h2>
   <p><b>Datas</b>: ${startDate} - ${endDate}</p>
   <p><b>Quantidade de coletas realizadas</b>: ${resumoColetas.quantidadeColetas}</p>
   <p><b>Quantidade de resíduos coletados</b>: ${resumoColetas.quantidadeColetada} kg</p>
 </div>`;
+    let main = "";
 
     if (completo) {
-      main += "<h2>Coletas realizadas:</h2>";
+      main += '<h2>Coletas realizadas:</h2>';
       for (let coleta of coletas) {
+
+        let catador = null;
+
+        if (coleta.idCatador != null) {
+          catador = await fetchCatadorInfo(coleta.idCatador);
+        }
+
+        let associacaoInfo = null;
+
+        if (coleta.idAssociacao != null) {
+          associacaoInfo = await fetchAssociacaoName(coleta.idAssociacao);
+        }
+
+        console.log(catador);
+        console.log(associacaoInfo)
         const coletaFormatada = `
-    <div class = "container">
-      ${coleta.idCatador != null ? "" : `
-        <p><b>Nome do catador</b>: ${catador.user.name}</p>
-        <p><b>Cpf do catador</b>: ${catador.cpf}</p>
-      `}
-      <p><b>Nome do associacao</b>: ${catador.associacao.user.name}</p>
-      <p><b>CNPJ da associacao</b>: ${catador.associacao.cnpj}</p>
-      <p><b>Data</b>: ${formatarData(coleta.dataColeta)}</p>
-      <p><b>Veículo utilizado</b>: ${veiculosUtilizados.map((veiculo, index) => (
-
-           { veiculo }
-
-        ))}</p>
-      <p><b>Quantidade de resíduos coletados</b>: ${coleta.quantidade} kg</p>
-      <p><b>Todos os pontos coletados</b>: ${coleta.pergunta ? 'Sim' : 'Não'}</p>
-      <p><b>Motivo</b>: ${coleta.motivo == null || coleta.motivo == "" ? '--' : coleta.motivo}</p>
-    </div>`;
+      <div class="container">
+        ${coleta.idCatador != null
+            ? ''
+            : `
+            <p><b>Nome do catador</b>: ${catador.catadorName}</p>
+            <p><b>Cpf do catador</b>: ${catador.cpfCatador}</p>
+          `}
+        <p><b>Nome do associacao</b>: ${associacaoInfo.name}</p>
+        <p><b>CNPJ da associacao</b>: ${associacaoInfo.cnpj}</p>
+        <p><b>Data</b>: ${formatarData(coleta.dataColeta)}</p>
+        <p><b>Veículo utilizado</b>: ${veiculosUtilizados.map(veiculo => veiculo).join(', ')}</p>
+        <p><b>Quantidade de resíduos coletados</b>: ${coleta.quantidade} kg</p>
+        <p><b>Todos os pontos coletados</b>: ${coleta.pergunta ? 'Sim' : 'Não'}</p>
+        <p><b>Motivo</b>: ${coleta.motivo == null || coleta.motivo == "" ? '--' : coleta.motivo}</p>
+      </div>`;
         main += coletaFormatada;
+
       }
     }
 
-
-
-    let main = "";
     const conteudoPDF = `
     <html>
       <head>

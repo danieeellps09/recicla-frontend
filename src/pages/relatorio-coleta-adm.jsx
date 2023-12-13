@@ -8,6 +8,7 @@ import {
   Dropdown,
   Form,
   Stack,
+  Modal
 } from "react-bootstrap";
 import "../style/css.css";
 import {
@@ -39,7 +40,10 @@ function RelatorioColetaAdm() {
   const [rotasRealizadas, setRotasRealizadas] = useState(0);
   const [idCatador, setIdCatador] = useState("");
   const [cnpj, setCnpj] = useState("");
-  const [cpf, setCatadorCpf] = useState("")
+  const [cpf, setCatadorCpf] = useState("");
+  const [showCheckbox, setShowCheckbox] = useState(false);
+  const [showCheckModal, setShowCheckModal] = useState(false);
+
   const [completo, setCompleto] = useState(true);
 
   const location = useLocation();
@@ -167,7 +171,7 @@ function RelatorioColetaAdm() {
         if (coletas && coletas.length > 0) {
           coletas.forEach((coleta) => {
 
-            setIdCatador(coleta.idCatador)
+            setIdCatador(coleta.idCatador);
             fetchCatadorName(coleta.idCatador);
             fetchAssociacaoName(coleta.idAssociacao);
             fetchVeiculoInfo(coleta.idVeiculo);
@@ -223,37 +227,31 @@ function RelatorioColetaAdm() {
   //
 
 
-
-
-
-  const testarGeracaoPDF = () => {
-    const pdf = new jsPDF();
-    pdf.text('Teste de PDF', 10, 10);
-
+  const handleConfirmPDF = async () => {
     try {
-      pdf.save('teste.pdf');
+      // Abra o modal aqui, antes de iniciar qualquer lógica
+      setShowCheckModal(true);
     } catch (error) {
-      console.error('Erro durante a geração do PDF:', error);
+      console.error('Erro ao baixar o relatório:', error);
     }
   };
-
+  
 
 
   const handleDownloadPDF = async () => {
     try {
-
+      setShowCheckModal(false);
+  
       if (!catadorInfo || !catadorInfo.id) {
         console.error('Informações do catador não disponíveis.');
         return;
       }
-
-
+  
       const catadorDetails = await fetchCatadorInfo(catadorInfo.id);
-      console.log('catadorDetails', catadorDetails)
       const coletasData = await Promise.all(coletas.map(async (coleta) => {
         const associacaoData = await fetchAssociacaoName(coleta.idAssociacao);
         const veiculoData = await fetchVeiculoInfo(coleta.idVeiculo);
-
+  
         return {
           ...coleta,
           catadorData: catadorDetails,
@@ -261,52 +259,40 @@ function RelatorioColetaAdm() {
           veiculoData,
         };
       }));
-
+  
       const resumoColetas = new ResumoColeta(coletasData);
-
-      // const pdfContent = formatarColetasFrontend({
-      //   coletas: coletasData,
-      //   catador: catadorDetails,
-      //   startDate: formatarData(dataInicialParam),
-      //   endDate: formatarData(dataFinalParam),
-      //   resumoColetas,
-      // }, completo);
-
-
+  
       const pdfOptions = {
         margin: 10,
         filename: 'relatorio.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
+        image: { type: 'png', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       };
-
-      console.log('Antes de html2pdf');
-
+  
       const pdfContentPromise = formatarColetasFrontend({
         coletas: coletasData,
         catador: catadorDetails,
         startDate: formatarData(dataInicialParam),
         endDate: formatarData(dataFinalParam),
         resumoColetas,
-    }, completo);
-
-    console.log('Antes de html2pdf');
-
-    pdfContentPromise.then(resolvedContent => {
+      }, completo);
+  
+      pdfContentPromise.then(resolvedContent => {
         const element = document.createElement('div');
         element.innerHTML = resolvedContent;
-
+  
         html2pdf(element, pdfOptions);
-    }).catch(error => {
+      
+
+      }).catch(error => {
         console.error('Erro durante a geração do PDF:', error);
-    });
-     } catch (error) {
+      });
+    } catch (error) {
       console.error('Erro ao baixar o relatório:', error);
-    }
+    } 
   };
-
-
+  
 
   const formatarColetasFrontend = async ({ coletas, catador, startDate, endDate, resumoColetas }, completo) => {
     // Sua lógica de estilos aqui
@@ -653,21 +639,46 @@ function RelatorioColetaAdm() {
             />
           </Col>
           <div className="mt-5 d-flex center justify-content-evenly">
-            <Button
-              type="submit"
-              className="w-25 mx-2 btn-orange"
-              onClick={handleDownloadPDF}
-            >
-              <BsDownload /> Baixar
-            </Button>
+          <Modal show={showCheckModal} onHide={() => setShowCheckModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Escolha do Relatório</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Check
+              type="checkbox"
+              label="Relatório Completo"
+              checked={completo}
+              onChange={() => setCompleto(!completo)}
+            />
+          </Modal.Body>
+          <Modal.Footer>
 
-            <Button
+          <Button variant="primary btn-blue" onClick={() => setShowCheckModal(false)}>
+              Fechar
+            </Button>
+            <Button variant="primary btn-orange" onClick={handleDownloadPDF}>
+              Baixar
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+          <Button
+            type="submit"
+            className="w-25 mx-2 btn-orange"
+            onClick={handleConfirmPDF}
+          >
+            <BsDownload /> Baixar
+          </Button>
+
+          <Button
               type="submit"
               className="w-25 mx-2 outline-white"
               onClick={handleGoBack}
             >
               <BsArrowLeftShort /> Voltar
             </Button>
+
+          
           </div>
         </Row>
       </Container>

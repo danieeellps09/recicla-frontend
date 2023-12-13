@@ -101,19 +101,19 @@ function ListaRelatorioColetaCatador() {
           },
         }
       );
-      console.log("Após a solicitação com sucesso");
-      setColetas(response.data);
       //   setShowRelatorio(true);
-      console.log(
-        "coletas antes de renderizar RelatorioColeta:",
-        response.data
-      );
+      let catadorId = 0
+      if (response.data.length > 0) {
+         catadorId = response.data[0].idCatador;
+      }
+
 
       navigate("/relatorio-coleta", {
         state: {
           coletas: response.data,
           startDate: startDate,
           endDate: endDate,
+          catadorId
         },
       });
     } catch (error) {
@@ -216,15 +216,6 @@ function ListaRelatorioColetaCatador() {
               <BsEyeFill /> Visualizar
             </Button>
 
-            <Button
-              type="submit"
-              className="w-25 mx-2 btn-orange"
-              onClick={handleDownloadPDF}
-              disabled={!startDate || !endDate }
-
-            >
-              <BsDownload /> Baixar
-            </Button>
             <Button
               type="submit"
               className="w-25 mx-2 outline-white "

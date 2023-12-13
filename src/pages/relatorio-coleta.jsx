@@ -8,6 +8,7 @@ import {
   Dropdown,
   Form,
   Stack,
+  Modal
 } from "react-bootstrap"; //TODO: "Stack", "Dropdown" E "Image"  NÃO ESTAO SENDO USADO
 import "../style/css.css";
 import {
@@ -19,12 +20,17 @@ import {
 import { Autenticacao } from "../config/Autenticacao";
 import { useLocation, useNavigate } from "react-router-dom";
 import { API } from "../services/api";
+import ResumoColeta from "../models/resumoColetas";
+import html2pdf from 'html2pdf.js';
 import axios from "axios";
 
 function RelatorioColeta() {
   const [catadorName, setCatadorName] = useState("");
   const [funcaoName, setFuncaoName] = useState("");
   const [associacaoName, setAssociacaoName] = useState("");
+  const [catadorInfo, setCatadorInfo] = useState({})
+  const [cnpj, setCnpj] = useState("");
+
 
   const [veiculos, setVeiculos] = useState([]); //TODO: "SETTER E STATE" NÃO ESTAO SENDO USADO
   const [quantidadeTotal, setQuantidadeTotal] = useState(0);
@@ -32,10 +38,13 @@ function RelatorioColeta() {
   const [veiculosUtilizados, setVeiculosUtilizados] = useState([]);
   const [rotasRealizadas, setRotasRealizadas] = useState(0);
   const [idCatador, setIdCatador] = useState("");
+  const [showCheckModal, setShowCheckModal] = useState(false);
+
   const [completo, setCompleto] = useState(false); //TODO: "SETTER" NÃO ESTA SENDO USADO
 
   const location = useLocation();
   const coletas = location.state?.coletas || [];
+  const catadorId = location.state.catadorId
   const dataInicialParam = location.state?.startDate || "";
   const dataFinalParam = location.state?.endDate || "";
 
@@ -47,6 +56,32 @@ function RelatorioColeta() {
       Authorization: `Bearer ${token}`,
     },
   };
+ 
+
+  const fetchCatadorInfo = async (idCatador) => {
+    try {
+      const response = await API.get(`/catadores/${idCatador}`, config);
+      return {
+        catadorName: response.data.user.name,
+        funcaoName: response.data.funcoescatador.funcao,
+        associacaoName: response.data.associacao.user.name,
+        cpfCatador: response.data.user.cpf,
+        endereco: response.data.endereco,
+        bairro: response.data.bairro
+      };
+    } catch (error) {
+      console.error("Erro ao obter informações do catador:", error);
+      return {
+        catadorName: "Nome do Catador Não Disponível",
+        funcaoName: "Função do Catador Não Disponível",
+        associacaoName: "Função do Catador Não Disponível",
+
+      };
+    }
+  };
+
+
+
   const fetchCatadorName = async (idCatador) => {
     try {
       const response = await API.get(`/catadores/${idCatador}`, config);
@@ -71,14 +106,21 @@ function RelatorioColeta() {
   }
 };
 
-  const fetchAssociacaoName = async (idAssociacao) => {
-    try {
-      const response = await API.get(`/associacoes/${idAssociacao}`, config);
-      setAssociacaoName(response.data.user.name);
-    } catch (error) {
-      console.error("Erro ao obter nome do associacao:", error);
-    }
-  };
+const fetchAssociacaoName = async (idAssociacao) => {
+  try {
+    const response = await API.get(`/associacoes/${idAssociacao}`, config);
+    const associacaoData = {
+      name: response.data.user.name,
+      cnpj: response.data.cnpj
+    };
+    setAssociacaoName(response.data.user.name);
+    setCnpj(response.data.cnpj)
+    return associacaoData
+  } catch (error) {
+    console.error("Erro ao obter nome do associacao:", error);
+    return null
+  }
+};
   const fetchVeiculoInfo = async (veiculoId) => {
     try {
       const response = await API.get(`/veiculos/${veiculoId}`);
@@ -132,10 +174,20 @@ function RelatorioColeta() {
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+
     if (coletas && coletas.length > 0) {
-      coletas.forEach((coleta) => {
+      console.log(catadorInfo)
+      setCatadorInfo(catadorInfo)
+      coletas.forEach(async(coleta) => {
         setIdCatador(coleta.idCatador);
+        const catadorInfo = await fetchCatadorInfo(coleta.idCatador);
+        setCatadorInfo((prevCatadorInfo) => ({
+          ...prevCatadorInfo,
+          [coleta.idCatador]: catadorInfo,
+        }));
         fetchCatadorName(coleta.idCatador);
+        fetchCatadorInfo(coleta.idCatador)
         fetchAssociacaoName(coleta.idAssociacao);
         fetchVeiculoInfo(coleta.idVeiculo);
       });
@@ -159,20 +211,258 @@ function RelatorioColeta() {
   
       loadCurrentUser();
     }
+  }
+
+  fetchData();
 
 
   }, []);
-  const handleDownloadPDF = async () => {
-    try {
-      const downloadURL = `/pdf/coleta/${idCatador}?completo=${completo}&datainicio=${formatarData(
-        dataInicialParam
-      )}&datafim=${formatarData(dataFinalParam)}`;
 
-      window.open(downloadURL, "_blank");
+
+  const handleConfirmPDF = async () => {
+    try {
+      // Abra o modal aqui, antes de iniciar qualquer lógica
+      setShowCheckModal(true);
     } catch (error) {
-      console.error("Erro ao baixar o relatório:", error);
+      console.error('Erro ao baixar o relatório:', error);
     }
   };
+  
+
+
+  const handleDownloadPDF = async () => {
+    try {
+      setShowCheckModal(false);
+      if (!catadorInfo || Object.keys(catadorInfo).length === 0) {
+        console.error('Informações do catador não disponíveis.');
+        return;
+      }
+
+      console.log("aqui esta o catador info", catadorInfo)
+  
+      const catadorDetails = await fetchCatadorInfo(catadorInfo.id);
+      const coletasData = await Promise.all(coletas.map(async (coleta) => {
+        const associacaoData = await fetchAssociacaoName(coleta.idAssociacao);
+        const veiculoData = await fetchVeiculoInfo(coleta.idVeiculo);
+  
+        return {
+          ...coleta,
+          catadorData: catadorDetails,
+          associacaoData,
+          veiculoData,
+        };
+      }));
+  
+      const resumoColetas = new ResumoColeta(coletasData);
+  
+      const pdfOptions = {
+        margin: 10,
+        filename: 'relatorio.pdf',
+        image: { type: 'png', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      };
+  
+      const pdfContentPromise = formatarColetasFrontend({
+        coletas: coletasData,
+        catador: catadorDetails,
+        startDate: formatarData(dataInicialParam),
+        endDate: formatarData(dataFinalParam),
+        resumoColetas,
+      }, completo);
+  
+      pdfContentPromise.then(resolvedContent => {
+        const element = document.createElement('div');
+        element.innerHTML = resolvedContent;
+  
+        html2pdf(element, pdfOptions);
+      
+
+      }).catch(error => {
+        console.error('Erro durante a geração do PDF:', error);
+      });
+    } catch (error) {
+      console.error('Erro ao baixar o relatório:', error);
+    } 
+  };
+  
+
+  const formatarColetasFrontend = async ({ coletas, catador, startDate, endDate, resumoColetas }, completo) => {
+    // Sua lógica de estilos aqui
+    const style = `<style type="text/css">
+  *{
+      margin:0;
+      padding: 0;
+  }
+  html {
+    -webkit-print-color-adjust: exact;
+  }
+  body {
+      font-family: sans-serif;
+      padding: 0 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  }
+
+  #container-logo{
+    height: 40px;
+    padding: 30px;
+    min-width: 10px;
+    background-color: #E1621E;
+    border-radius: 30px;
+    margin-bottom: 30px;
+  }
+
+  #container-logo img{
+    height: 100%;
+  }
+
+  h1, h2, h3 {
+      text-transform: uppercase;
+      color: #E1621E;
+      text-align: center;
+      margin-bottom: 30px;
+      width: 100%;
+  }
+
+  .container {
+      border:#E1621E 2px solid;
+      border-radius: 30px;
+      padding: 20px 30px;
+      width:100%;
+      margin-bottom: 50px;
+
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+  }
+
+  p{
+      color:rgb(95, 95, 95);
+      font-size: 20px;
+      margin-bottom: 10px;
+      width: 100%;
+      font-display: inherit;
+  }
+
+  .linha{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+      width: 100%;
+  }
+
+  .linha p{
+      width:50%;
+      font-size: 20px;
+  }
+
+  .margin-top{
+    margin-top: 30px;
+  }
+
+  ul{
+    margin-left: 20px;
+    color: #E1621E;
+    font-size: 30px;
+  }
+</style>`;
+
+    console.log("dados coleta: ", coletas, catador, startDate, endDate, resumoColetas, completo)
+
+
+ const catadorInfo = coletas.idCatador != null ? `
+<div class="container">
+  <h2>Dados de catador</h2>
+  <div class="linha">
+    <p><b>Catador</b>: ${catador.catadorName}</p>
+    <p><b>CPF</b>: ${catador.cpf}</p>
+  </div>
+  <div class="linha">
+    <p><b>Bairro</b>: ${catador.bairro}</p>
+    <p><b>Endereço</b>: ${catador.endereco}</p>
+  </div>
+</div>` : "";
+
+
+    const resumo = `
+<div class="container"> 
+  <h2>Resumo da Coleta</h2>
+  <p><b>Datas</b>: ${startDate} - ${endDate}</p>
+  <p><b>Quantidade de coletas realizadas</b>: ${resumoColetas.quantidadeColetas}</p>
+  <p><b>Quantidade de resíduos coletados</b>: ${resumoColetas.quantidadeColetada} kg</p>
+</div>`;
+    let main = "";
+
+    if (completo) {
+      main += '<h2>Coletas realizadas:</h2>';
+      for (let coleta of coletas) {
+
+        let catador = null;
+
+        if (coleta.idCatador != null) {
+          catador = await fetchCatadorInfo(coleta.idCatador);
+        }
+
+        let associacaoInfo = null;
+
+        if (coleta.idAssociacao != null) {
+          associacaoInfo = await fetchAssociacaoName(coleta.idAssociacao);
+        }
+
+        console.log(catador);
+        console.log(associacaoInfo)
+        const coletaFormatada = `
+      <div class="container">
+        ${coleta.idCatador != null
+            ? ''
+            : `
+            <p><b>Nome do catador</b>: ${catador.catadorName}</p>
+            <p><b>Cpf do catador</b>: ${catador.cpfCatador}</p>
+          `}
+        <p><b>Nome do associacao</b>: ${associacaoInfo.name}</p>
+        <p><b>CNPJ da associacao</b>: ${associacaoInfo.cnpj}</p>
+        <p><b>Data</b>: ${formatarData(coleta.dataColeta)}</p>
+        <p><b>Veículo utilizado</b>: ${veiculosUtilizados.map(veiculo => veiculo).join(', ')}</p>
+        <p><b>Quantidade de resíduos coletados</b>: ${coleta.quantidade} kg</p>
+        <p><b>Todos os pontos coletados</b>: ${coleta.pergunta ? 'Sim' : 'Não'}</p>
+        <p><b>Motivo</b>: ${coleta.motivo == null || coleta.motivo == "" ? '--' : coleta.motivo}</p>
+      </div>`;
+        main += coletaFormatada;
+
+      }
+    }
+
+    const conteudoPDF = `
+    <html>
+      <head>
+        ${style}
+      </head>
+      <body>
+        <div id="container-logo">
+          <img src="https://drive.google.com/uc?export=download&id=16E44t6GPW24wkxOBbLIiag1LJptWokk1" alt="">
+        </div>
+        ${catadorInfo}
+        ${resumo}
+        ${main}
+      </body>
+    </html>
+  `;
+
+    return conteudoPDF;
+  };
+
+
+
+
+
+
+
+
+
+
+
   return (
     <>
       <Container
@@ -365,10 +655,34 @@ function RelatorioColeta() {
             />
           </Col>
           <div className="mt-5 d-flex center justify-content-evenly">
+          <Modal show={showCheckModal} onHide={() => setShowCheckModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Escolha do Relatório</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Check
+              type="checkbox"
+              label="Relatório Completo"
+              checked={completo}
+              onChange={() => setCompleto(!completo)}
+            />
+          </Modal.Body>
+          <Modal.Footer>
+
+          <Button variant="primary btn-blue" onClick={() => setShowCheckModal(false)}>
+              Fechar
+            </Button>
+            <Button variant="primary btn-orange" onClick={handleDownloadPDF}>
+              Baixar
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+
             <Button
               type="submit"
               className="w-25 mx-2 btn-orange"
-              onClick={handleDownloadPDF}
+              onClick={handleConfirmPDF}
             >
               <BsDownload /> Baixar
             </Button>

@@ -123,54 +123,6 @@ function ListaRelatorioColeta() {
     }
   };
 
-  const handleDownloadPDF = async () => {
-    try {
-      const response = await API.get(
-        `/pdf/coleta/${selectedCatador}`, // Supondo que você deseja usar o ID da primeira venda
-        {
-          params: {
-            completo: true,
-            datainicio: formatDate(startDate, "dd/MM/yyyy"),
-            datafim: formatDate(endDate, "dd/MM/yyyy"),
-          },
-          responseType: "blob",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "relatorio.pdf");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Erro ao baixar o PDF:", error);
-    }
-  };
-
-  const handleExportToXLSX = () => {
-    try {
-      const worksheet = XLSX.utils.json_to_sheet(coletas);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Coletas");
-
-      const blob = XLSX.write(workbook, { bookType: "xlsx", type: "blob" });
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "coletas.xlsx");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Erro ao exportar para XLSX:", error);
-    }
-  };
 
 
 
@@ -268,15 +220,7 @@ function ListaRelatorioColeta() {
             >
               <BsEyeFill /> Visualizar
             </Button>
-            <Button
-              type="submit"
-              className="w-25 mx-2 btn-orange"
-              onClick={handleDownloadPDF}
-              disabled={!startDate || !endDate || !selectedCatador}
-
-            >
-              <BsDownload /> Baixar
-            </Button>
+          
           
             <Button
               type="submit"

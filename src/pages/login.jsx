@@ -52,7 +52,7 @@ function Login() {
     };
 
     axios
-      .post("http://3.129.19.7:3000/login", data)
+      .post("https://reciclo.api-reciclo.free.nf/login", data)
       .then((response) => {
         // se a resposta for 200, gera o token
         if (response.status === 200) {

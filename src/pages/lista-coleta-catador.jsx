@@ -245,7 +245,7 @@ const AdicionarColeta = (props) => {
               className="form-control custom-focus"
               value={motivo}
               onChange={(e) => setMotivo(e.target.value)}
-              disabled={pergunta}
+              disabled={selectedPergunta}
             />
           </Form>
         </Row>

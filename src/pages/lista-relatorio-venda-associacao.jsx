@@ -215,15 +215,7 @@ function ListaRelatorioVendaAssociacao() {
               <BsEyeFill /> Visualizar
             </Button>
 
-            <Button
-              type="submit"
-              className="w-25 mx-2 btn-orange"
-              onClick={handleDownloadPDF}
-              disabled={!startDate || !endDate }
-
-            >
-              <BsDownload /> Baixar
-            </Button>
+            
             <Button
               type="submit"
               className="w-25 mx-2 outline-white "

@@ -113,7 +113,7 @@ function Login() {
         style={{ minHeight: "90vh" }}
       >
         <Row className="border bg-white rounded-5 shadow mt-5 w-100">
-          <Col className="d-flex align-items-center justify-content-center">
+          <Col sm={12} md={6} className="d-flex align-items-center justify-content-center">
             <Form className="w-75 p-3">
               <Form.Group>
                 <FormLabel>Email</FormLabel>
@@ -180,8 +180,9 @@ function Login() {
               <EsqueciSenhaModal show={showModal} onClose={handleCloseModal} />
             </Form>
           </Col>
-          <Col>
-            <Image className="p-4" src={telaLogin} alt="Tela de Login" />
+          <Col sm={12} md={6}>
+
+            <Image className="p-4 w-100 h-100" src={telaLogin} alt="Tela de Login" />
           </Col>
         </Row>
       </Container>

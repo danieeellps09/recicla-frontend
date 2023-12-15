@@ -92,7 +92,7 @@ function ListaRelatorioVendaAssociacao() {
   const handleClick = async () => {
     try {
       const response = await API.get(
-        "/forms/venda/vendas/vendas-between-dates",
+        "/forms/venda/vendas/vendas-by-associacao",
         {
           params,
           headers: {
@@ -100,15 +100,19 @@ function ListaRelatorioVendaAssociacao() {
           },
         }
       );
-      console.log("Após a solicitação com sucesso");
       setVendas(response.data);
-      console.log("venda antes de renderizar RelatorioColeta:", response.data);
+
+      let idAssociacao = 0
+      if (response.data.length > 0) {
+         idAssociacao = response.data[0].idAssociacao;
+      }
 
       navigate("/relatorio-venda", {
         state: {
           vendas: response.data,
           startDate: startDate,
           endDate: endDate,
+          idAssociacao
         },
       });
     } catch (error) {

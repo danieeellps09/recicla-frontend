@@ -18,7 +18,7 @@ class VendaMaterial {
         venda.materiais.forEach(material => {
           const vendaMaterial = materiaisMap.get(material.id);
           if (vendaMaterial) {
-            vendaMaterial.quantidade += material.quantidadeVendida;
+            vendaMaterial.quantidade += material.quantidade;
           }
         });
       });

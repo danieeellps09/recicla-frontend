@@ -332,9 +332,9 @@ function RelatorioVendaAdm() {
 let resumoMateriais = '';
 resumoVendas.vendasPorMaterial.forEach((vendaPorMaterial) => {
   console.log("Nome do material:", vendaPorMaterial.nome);
-  console.log("Quantidade vendida (antes):", vendaPorMaterial.quantidadeVendida);
+  console.log("Quantidade vendida (antes):", vendaPorMaterial.quantidade);
   resumoMateriais += `<li>
-    <p><b>${vendaPorMaterial.nome}</b>: ${vendaPorMaterial.quantidadeVendida} kg</p>
+    <p><b>${vendaPorMaterial.nome}</b>: ${vendaPorMaterial.quantidade} kg</p>
   </li>`}
   )
 
@@ -362,7 +362,7 @@ const resumo = `
 
         let materiais = '';
         venda.materiais.forEach(material =>{
-          materiais += `<li><p><b>${material.nomeMaterial}</b>: ${material.quantidadeVendida} kg</p></li>`
+          materiais += `<li><p><b>${material.nome}</b>: ${material.quantidade} kg</p></li>`
         })
      
         const vendaFormatada = `

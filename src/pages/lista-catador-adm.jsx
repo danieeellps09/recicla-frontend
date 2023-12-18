@@ -115,7 +115,6 @@ const AdicionarCatador = (props) => {
     API.post("/catadores", dataToSend)
       .then((response) => {
         if (response && response.data) {
-          console.log("Catador criado com sucesso:", response.data);
           setNome("");
           setEmail("");
           setPassword("");
@@ -397,18 +396,15 @@ function EditarCatador(props) {
       idGenero: selectedGenero,
       funcaoId: selectedFuncao,
     };
-    console.log(dataToSend);
-    console.log(props.catadorId);
+    
     API.put(`/catadores/${props.catadorId}`, dataToSend)
       .then((response) => {
         if (response && response.data) {
-          console.log("Catador atualizado com sucesso:", response.data);
           toast.success("Catador atualizado com sucesso");
           props.onHide();
 
           setCatador(response.data);
           window.location.reload();
-          console.log("Após a atualização do estado catador:", catador);
         } else {
           console.error("Resposta inválida ao atualizar catador:", response);
         }

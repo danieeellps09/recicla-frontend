@@ -303,7 +303,6 @@ function RelatorioVendaAdm() {
   }
 </style>`;
 
-    console.log("dados venda: ", vendas, associacao, startDate, endDate, resumoVendas, completo)
 
 
  const associacaoInfo = vendas.idAssociacao != null ? `
@@ -323,8 +322,7 @@ function RelatorioVendaAdm() {
 
 let resumoMateriais = '';
 resumoVendas.vendasPorMaterial.forEach((vendaPorMaterial) => {
-  console.log("Nome do material:", vendaPorMaterial.nome);
-  console.log("Quantidade vendida (antes):", vendaPorMaterial.quantidade);
+
   resumoMateriais += `<li>
     <p><b>${vendaPorMaterial.nome}</b>: ${vendaPorMaterial.quantidade} kg</p>
   </li>`}

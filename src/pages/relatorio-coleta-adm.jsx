@@ -181,8 +181,6 @@ function RelatorioColetaAdm() {
           const rotasRealizadasCount = calcularRotasRealizadas(coletas);
           setRotasRealizadas(rotasRealizadasCount);
 
-          console.log("coletas dentro do useEffect:", coletas);
-          console.log("useEffect em RelatorioColeta foi chamado.");
         } else if (catadorInfo && catadorInfo.id) {
 
           const fetchCatadorDetails = async () => {
@@ -351,7 +349,6 @@ function RelatorioColetaAdm() {
   }
 </style>`;
 
-    console.log("dados coleta: ", coletas, catador, startDate, endDate, resumoColetas, completo)
 
 
  const catadorInfo = coletas.idCatador != null ? `

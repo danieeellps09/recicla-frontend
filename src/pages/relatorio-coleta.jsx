@@ -91,7 +91,6 @@ function RelatorioColeta() {
   const fetchCurrentUser = async () => {
   try {
     const response = await axios.get("https://reciclo.api-reciclo.free.nf/current_user", config);
-    console.log(response)
     const catadorName = response.data.name ;
 
     return catadorName;
@@ -171,7 +170,6 @@ const fetchAssociacaoName = async (idAssociacao) => {
     const fetchData = async () => {
 
     if (coletas && coletas.length > 0) {
-      console.log(catadorInfo)
       setCatadorInfo(catadorInfo)
       coletas.forEach(async(coleta) => {
         setIdCatador(coleta.idCatador);
@@ -195,8 +193,7 @@ const fetchAssociacaoName = async (idAssociacao) => {
       const rotasRealizadasCount = calcularRotasRealizadas(coletas);
       setRotasRealizadas(rotasRealizadasCount);
 
-      console.log("coletas dentro do useEffect:", coletas);
-      console.log("useEffect em RelatorioColeta foi chamado.");
+
     } else {
       const loadCurrentUser = async () => {
         const catadorName = await fetchCurrentUser();
@@ -231,7 +228,6 @@ const fetchAssociacaoName = async (idAssociacao) => {
         return;
       }
 
-      console.log("aqui esta o catador info", catadorInfo)
   
       const catadorDetails = await fetchCatadorInfo(catadorInfo.id);
       const coletasData = await Promise.all(coletas.map(async (coleta) => {
@@ -402,8 +398,6 @@ const fetchAssociacaoName = async (idAssociacao) => {
           associacaoInfo = await fetchAssociacaoName(coleta.idAssociacao);
         }
 
-        console.log(catador);
-        console.log(associacaoInfo)
         const coletaFormatada = `
       <div class="container">
         ${coleta.idCatador != null

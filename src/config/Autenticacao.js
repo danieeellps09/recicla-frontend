@@ -19,6 +19,6 @@ export function Autenticacao() {
             )
         }
     } catch (error) {
-        console.log('Erro ao decodificar o token:', error);
+        console.error('Erro ao decodificar o token:', error);
     }
 }

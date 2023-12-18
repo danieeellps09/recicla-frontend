@@ -300,7 +300,6 @@ function ListaVendaAdm() {
     const showModalAdicionar = () => setModalAdicionar(true);
     const hideModalAdicionar = () => setModalAdicionar(false);
 
-    // Função para paginar os resultados
     const paginateResults = (data, page, resultsPerPage) => {
         const startIndex = (page - 1) * resultsPerPage;
         const endIndex = startIndex + resultsPerPage;

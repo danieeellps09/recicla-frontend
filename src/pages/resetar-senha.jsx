@@ -17,9 +17,6 @@ function RedefinirSenha() {
     setShowPassword(!showPassword);
   };
 
-  useEffect(() => {
-    console.log("Token:", token); 
-  }, [token]);
 
 
   const handleSubmit = async (e) => {
@@ -39,7 +36,6 @@ function RedefinirSenha() {
           });
           navigate("/");
         } else {
-          console.log(response.status)
           toast.error("Falha ao redefinir senha.", {
             position: "bottom-right",
             duration: 2000,

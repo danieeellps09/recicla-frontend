@@ -50,9 +50,7 @@ function MudarSenha(props) {
 
     const autenticacao = Autenticacao();
     const token = autenticacao.token;
-    console.log("Token:", token);
-
-    console.log(senha);
+   
     if (senha === confirmarSenha) {
       try {
         const response = await API.put(
@@ -72,7 +70,7 @@ function MudarSenha(props) {
           setSenha("");
           setConfirmarSenha("");
           props.onHide();
-          console.log("Senha alterada com sucesso!");
+          console.error("Senha alterada com sucesso!");
         } else {
           console.error("Erro ao alterar a senha:", response.statusText);
           toast.error("Erro ao mudar senha");
@@ -89,7 +87,7 @@ function MudarSenha(props) {
         toast.error("Erro ao mudar senha");
       }
     } else {
-      console.log("As senhas não coincidem. Por favor, digite novamente.");
+      console.error("As senhas não coincidem. Por favor, digite novamente.");
     }
   };
   return (
@@ -200,7 +198,6 @@ function MudarEmail(props) {
           setConfirmarEmail("");
 
           props.onHide();
-          console.log("Email alterado com sucesso!");
         } else {
           console.error("Erro ao alterar o email:", response.statusText);
         }
@@ -210,7 +207,7 @@ function MudarEmail(props) {
       }
     } else {
       toast.error("Os emails não coincidem. Por favor, digite novamente.");
-      console.log("Os emails não coincidem. Por favor, digite novamente.");
+      console.error("Os emails não coincidem. Por favor, digite novamente.");
     }
   };
 

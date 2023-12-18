@@ -1,6 +1,5 @@
 import React from "react";
 import { Container, Row } from "react-bootstrap";
-import { BsEmojiDizzy } from "react-icons/bs"; //TODO: NAO ESTA SENDO UTILIZADO
 import img404 from "../images/404.png";
 
 const PaginaNaoEncontrada = () => {

@@ -18,7 +18,7 @@ function RedefinirSenha() {
   };
 
   useEffect(() => {
-    console.log("Token:", token); // Verifique se o token está sendo capturado corretamente
+    console.log("Token:", token); 
   }, [token]);
 
 

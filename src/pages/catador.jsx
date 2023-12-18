@@ -3,8 +3,7 @@ import { Button, Col, Container, Row, Image } from "react-bootstrap";
 import {
   BsFillFileEarmarkFill,
   BsBarChartFill,
-  BsRecycle,
-} from "react-icons/bs"; //TODO:  'BsRecycle' NÃO ESTA SENDO USADO
+} from "react-icons/bs"; 
 import TelaAdmin from "../images/telaadmin.svg";
 import "../style/css.css";
 import { useNavigate } from "react-router-dom";
@@ -36,8 +35,7 @@ function Catador() {
                 Você está acessando como{" "}
                 <span style={{ color: "#EF7A2A" }}>CATADOR</span> da plataforma.
               </h5>
-              {/* TODO: DARIA PARA APLICAR UMA REFATORACO NOS BOTOES ABAIXO, IGUAL EU
-            REALIZEI EM OUTRAS TELAS, CASO QUEIRA */}
+           
               <Button
                 type="submit"
                 onClick={linkListaColeta}

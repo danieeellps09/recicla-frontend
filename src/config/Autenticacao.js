@@ -8,9 +8,9 @@ export function Autenticacao() {
 
     try {
         if (token) {
-            const decodedToken = jwtDecode(token); // Decodifica o token
-            roleNames = decodedToken.roleNames; // pega o roleNames
-            email = decodedToken.email // pega o email
+            const decodedToken = jwtDecode(token); 
+            roleNames = decodedToken.roleNames; 
+            email = decodedToken.email
             return { roleNames, email, token };
         } else if (!token || token === undefined) {
             return (

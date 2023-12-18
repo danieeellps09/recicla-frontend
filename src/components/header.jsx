@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Button, Container, Navbar } from 'react-bootstrap';
 import { BsPersonCircle, BsHouseFill, BsDoorOpenFill } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from "jwt-decode"; // Correção na importação
+import { jwtDecode } from "jwt-decode"; 
 import '../style/css.css';
 import recicloLogo from '../images/reciclo-logo.png';
 

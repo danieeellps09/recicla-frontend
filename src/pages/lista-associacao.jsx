@@ -10,8 +10,7 @@ import {
   Row,
   Modal,
   Form,
-  FormLabel,
-  Dropdown,
+ 
 } from "react-bootstrap";
 import InputMask from "react-input-mask";
 import {
@@ -38,15 +37,6 @@ const AdicionarAssociacao = (props) => {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [associacoes, setAssociacoes] = useState([]);
-  const [etnias, setEtnias] = useState([]);
-  const [generos, setGeneros] = useState([]);
-  const [selectedAssociacao, setSelectedAssociacao] = useState("");
-  const [selectedEtnia, setSelectedEtnia] = useState("");
-  const [selectedGenero, setSelectedGenero] = useState("");
-  const [visualSelectedAssociacao, setVisualSelectedAssociacao] = useState("");
-  const [visualSelectedEtnia, setVisualSelectedEtnia] = useState("");
-  const [visualSelectedGenero, setVisualSelectedGenero] = useState("");
   const [bairro, setBairro] = useState("");
   const [endereco, setEndereco] = useState("");
 
@@ -78,7 +68,6 @@ const AdicionarAssociacao = (props) => {
     API.post("/associacoes", dataToSend)
       .then((response) => {
         if (response && response.data) {
-          console.log("Associacao criado com sucesso:", response.data);
           setNome("");
           setEmail("");
           setPassword("");
@@ -191,9 +180,7 @@ function EditarAssociacao(props) {
 
   const [associacao, setAssociacao] = useState(null);
 
-  const [associacaoSelecionadoId, setassociacaoSelecionadoId] = useState(
-    props.associacaoId
-  );
+ 
 
   useEffect(() => {
     const fetchData = async (url, setterFunction) => {
@@ -231,13 +218,11 @@ function EditarAssociacao(props) {
     API.put(`/associacoes/${props.associacaoId}`, dataToSend)
       .then((response) => {
         if (response && response.data) {
-          console.log("Associacao atualizado com sucesso:", response.data);
           toast.success("Associacao atualizado com sucesso");
           props.onHide();
 
           setAssociacao(response.data);
           window.location.reload();
-          console.log("Após a atualização do estado associacao:", associacao);
         } else {
           console.error("Resposta inválida ao atualizar associacao:", response);
         }
@@ -352,7 +337,6 @@ function ListarAssociacoes() {
               (associacao) => associacao.id !== associacaoId
             )
           );
-          // Atualizar a lista de associacoes após a exclusão (pode ser necessário recarregar a página ou obter novamente os dados)
         } else {
           console.error("Resposta inválida ao excluir a:", response);
           toast.error(
@@ -446,22 +430,16 @@ function ListarAssociacoes() {
 
   const [modalShow, setModalShow] = React.useState(false);
 
-  // Função para paginar os resultados
   const paginateResults = (data, page, resultsPerPage) => {
     const startIndex = (page - 1) * resultsPerPage;
     const endIndex = startIndex + resultsPerPage;
     return data.slice(startIndex, endIndex);
   };
 
-  // Definimos a quantidade de resultados por página
   const resultsPerPage = 5;
 
-  // Filtramos os resultados da página atual
-  const currentResults = associacaoData
-    ? paginateResults(associacaoData, currentPage, resultsPerPage)
-    : [];
 
-  // Calculamos o número total de páginas
+
   const totalPages = associacaoData
     ? Math.ceil(associacaoData.length / resultsPerPage)
     : 0;

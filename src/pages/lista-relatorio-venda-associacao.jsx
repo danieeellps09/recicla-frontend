@@ -4,24 +4,16 @@ import {
   Button,
   Col,
   Container,
-  Image,
   Row,
-  FormControl,
-  Dropdown,
 } from "react-bootstrap";
-import fotoPerfil from "../images/perfil.jpg";
 
 import "../style/css.css";
 import {
   BsArrowLeftShort,
-  BsCalendar,
-  BsDownload,
-  BsEye,
   BsEyeFill,
 } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Autenticacao } from "../config/Autenticacao";
-import RelatorioVenda from "./relatorio-venda";
 
 import { API } from "../services/api";
 
@@ -66,7 +58,6 @@ function ListaRelatorioVendaAssociacao() {
       return `${day}/${month}/${year}`;
     }
 
-    // Se o formato não for reconhecido, retorna o formato padrão.
     return `${year}-${month}-${day}`;
   };
 
@@ -120,34 +111,6 @@ function ListaRelatorioVendaAssociacao() {
     }
   };
 
-  const handleDownloadPDF = async () => {
-    try {
-      const response = await API.get(
-        `/pdf/venda-associacao`, // Supondo que você deseja usar o ID da primeira venda
-        {
-          params: {
-            completo: true,
-            datainicio: formatDate(startDate, "dd/MM/yyyy"),
-            datafim: formatDate(endDate, "dd/MM/yyyy"),
-          },
-          responseType: "blob",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "relatorio.pdf");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Erro ao baixar o PDF:", error);
-    }
-  };
 
   return (
     <>

@@ -1,12 +1,11 @@
 import React from "react";
 import { Button, Col, Container, Row, Image } from "react-bootstrap";
 import {
-  BsPeopleFill,
   BsShareFill,
   BsBarChartFill,
   BsFillFileEarmarkFill,
   BsBicycle,
-} from "react-icons/bs"; //TODO: "BsPeopleFill" NÃO ESTA SENDO UTILIZADO
+} from "react-icons/bs";
 import TelaAdmin from "../images/telaadmin.svg";
 import "../style/css.css";
 import { useNavigate } from "react-router-dom";
@@ -90,9 +89,7 @@ function Admin() {
               <span style={{ color: "#EF7A2A" }}> ADMINISTRADOR</span> da
               plataforma.
             </h5>
-            {/* TODO: CODIGO COMENTADO */}
-            {/* <Button type='submit' className='rounded-5 btn-orange w-100 p-3 mb-2'><BsBicycle size={20} className='m-2'/>VEÍCULOS </Button>
-                            <Button type='submit' className='rounded-5 btn-orange w-100 p-3 mb-2'><BsRecycle size={20} className='m-2'/>MATERIAL </Button> */}
+          
             {buttonsData.map(
               ({ onClick, icon: Icon, text, className }, index) => (
                 <Button

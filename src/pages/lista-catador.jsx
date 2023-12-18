@@ -307,28 +307,17 @@ function EditarCatador(props) {
   const [generos, setGeneros] = useState([]);
   const [funcoes, setFuncoes] = useState([]);
 
-  const [selectedAssociacao, setSelectedAssociacao] = useState("");
   const [selectedEtnia, setSelectedEtnia] = useState("");
   const [selectedGenero, setSelectedGenero] = useState("");
   const [selectedFuncao, setSelectedFuncao] = useState("");
-
-  const [visualSelectedGenero, setVisualSelectedGenero] = useState("");
-  const [visualSelectedAssociacao, setVisualSelectedAssociacao] = useState("");
-  const [visualSelectedEtnia, setVisualSelectedEtnia] = useState("");
-  const [selectedAssociacaoCatador, setSelectedAssociacaoCatador] =
-    useState("");
   const [selectedAssociacaoId, setSelectedAssociacaoId] = useState("");
   const [selectedAssociacaoName, setSelectedAssociacaoName] = useState("");
-  const [selectedGeneroId, setSelectedGeneroId] = useState("");
   const [selectedEtniaName, setSelectedEtniaName] = useState("");
   const [selectedGeneroName, setSelectedGeneroName] = useState("");
   const [selectedFuncaoName, setSelectedFuncaoName] = useState("");
 
   const [catador, setCatador] = useState(null);
 
-  const [catadorSelecionadoId, setCatadorSelecionadoId] = useState(
-    props.catadorId
-  ); // Utilizando o ID do catador passado como prop
 
   useEffect(() => {
     const fetchData = async (url, setterFunction) => {
@@ -584,10 +573,9 @@ function ListarCatadores() {
   const [modalAdicionarShow, setModalAdicionarShow] = useState(false);
   const [modalEditarShow, setModalEditarShow] = useState(false);
   const [showConfirmacaoModal, setShowConfirmacaoModal] = useState(false);
-  // Estado para armazenar o ID do catador a ser excluído
   const [catadorParaExcluir, setCatadorParaExcluir] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false); // Adicione esta linha
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false); 
 
   console.log(catadorData);
 
@@ -653,27 +641,19 @@ function ListarCatadores() {
     setShowConfirmacaoModal(true);
   };
 
-  // Função para confirmar a exclusão
   const handleConfirmarExclusao = () => {
-    // Chamar a função de exclusão com o ID do catador
     handleExcluirCatador(catadorParaExcluir);
-    // Esconder o modal de confirmação
     setShowConfirmacaoModal(false);
   };
 
-  // Função para cancelar a exclusão
   const handleCancelarExclusao = () => {
-    // Limpar o ID do catador
     setCatadorParaExcluir(null);
-    // Esconder o modal de confirmação
     setShowConfirmacaoModal(false);
   };
 
-  // Token de autenticação
   const autenticacao = Autenticacao();
   const token = autenticacao.token;
 
-  // Configuração do cabeçalho com o token
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -681,14 +661,13 @@ function ListarCatadores() {
   };
 
   useEffect(() => {
-    // Fazendo a chamada para o backend para obter os dados do catador
     API.get("/catadores/pega-catadores/associacao", config)
       .then((response) => {
         setCatadorData(response.data);
 
         if (!showSuccessMessage) {
           toast.success("Catadores listados com sucesso!");
-          setShowSuccessMessage(true); // Atualize o estado para evitar exibir a mensagem novamente
+          setShowSuccessMessage(true); 
         }
       })
       .catch((error) => {
@@ -701,22 +680,18 @@ function ListarCatadores() {
 
   const [modalShow, setModalShow] = React.useState(false);
 
-  // Função para paginar os resultados
   const paginateResults = (data, page, resultsPerPage) => {
     const startIndex = (page - 1) * resultsPerPage;
     const endIndex = startIndex + resultsPerPage;
     return data.slice(startIndex, endIndex);
   };
 
-  // Definimos a quantidade de resultados por página
   const resultsPerPage = 2;
 
-  // Filtramos os resultados da página atual
   const currentResults = catadorData
     ? paginateResults(catadorData, currentPage, resultsPerPage)
     : [];
 
-  // Calculamos o número total de páginas
   const totalPages = catadorData
     ? Math.ceil(catadorData.length / resultsPerPage)
     : 0;

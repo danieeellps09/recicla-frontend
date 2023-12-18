@@ -54,15 +54,12 @@ function Login() {
     axios
       .post("https://reciclo.api-reciclo.free.nf/login", data)
       .then((response) => {
-        // se a resposta for 200, gera o token
         if (response.status === 200) {
           const { access_token } = response.data;
 
-          // armazena o token
           localStorage.setItem("token", access_token);
 
           try {
-            // decodifica o token armazenado
             const decodedToken = jwtDecode(access_token);
             const roleNames = decodedToken.roleNames;
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Navbar } from 'react-bootstrap';
-import recicloLogo from '../images/reciclo-logo.png'; // Corrija o nome da variável
+import recicloLogo from '../images/reciclo-logo.png'; 
 
 function HeaderLogin() {
     return (

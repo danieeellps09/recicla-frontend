@@ -4,19 +4,15 @@ import {
   Col,
   Container,
   Row,
-  Image,
-  Dropdown,
   Form,
-  Stack,
   Modal
-} from "react-bootstrap"; //TODO: "Stack", "Dropdown" E "Image"  NÃO ESTAO SENDO USADO
+} from "react-bootstrap"; 
 import "../style/css.css";
 import {
   BsArrowLeftShort,
   BsDownload,
-  BsEyeFill,
   BsCaretRightFill,
-} from "react-icons/bs"; //TODO: "BsEyeFill" NÃO ESTAO SENDO USADO
+} from "react-icons/bs"; 
 import { Autenticacao } from "../config/Autenticacao";
 import { useLocation, useNavigate } from "react-router-dom";
 import { API } from "../services/api";
@@ -32,7 +28,6 @@ function RelatorioColeta() {
   const [cnpj, setCnpj] = useState("");
 
 
-  const [veiculos, setVeiculos] = useState([]); //TODO: "SETTER E STATE" NÃO ESTAO SENDO USADO
   const [quantidadeTotal, setQuantidadeTotal] = useState(0);
   const [rotasTotais, setRotasTotais] = useState(0);
   const [veiculosUtilizados, setVeiculosUtilizados] = useState([]);
@@ -40,7 +35,7 @@ function RelatorioColeta() {
   const [idCatador, setIdCatador] = useState("");
   const [showCheckModal, setShowCheckModal] = useState(false);
 
-  const [completo, setCompleto] = useState(false); //TODO: "SETTER" NÃO ESTA SENDO USADO
+  const [completo, setCompleto] = useState(false); 
 
   const location = useLocation();
   const coletas = location.state?.coletas || [];
@@ -137,7 +132,6 @@ const fetchAssociacaoName = async (idAssociacao) => {
 
   const calcularRotasRealizadas = (coletas) => {
     return coletas.reduce((total, coleta) => {
-      // Se a coleta foi realizada em todos os pontos (pergunta === true), incrementa o total
       return coleta.pergunta ? total + 1 : total;
     }, 0);
   };
@@ -221,7 +215,6 @@ const fetchAssociacaoName = async (idAssociacao) => {
 
   const handleConfirmPDF = async () => {
     try {
-      // Abra o modal aqui, antes de iniciar qualquer lógica
       setShowCheckModal(true);
     } catch (error) {
       console.error('Erro ao baixar o relatório:', error);
@@ -288,7 +281,6 @@ const fetchAssociacaoName = async (idAssociacao) => {
   
 
   const formatarColetasFrontend = async ({ coletas, catador, startDate, endDate, resumoColetas }, completo) => {
-    // Sua lógica de estilos aqui
     const style = `<style type="text/css">
   *{
       margin:0;
@@ -369,7 +361,6 @@ const fetchAssociacaoName = async (idAssociacao) => {
   }
 </style>`;
 
-    console.log("dados coleta: ", coletas, catador, startDate, endDate, resumoColetas, completo)
 
 
  const catadorInfo = coletas.idCatador != null ? `
@@ -452,15 +443,6 @@ const fetchAssociacaoName = async (idAssociacao) => {
 
     return conteudoPDF;
   };
-
-
-
-
-
-
-
-
-
 
 
   return (
@@ -594,7 +576,6 @@ const fetchAssociacaoName = async (idAssociacao) => {
         </Row>
         <Row className="w-100 my-1">
           <Col>
-            {/* Novo campo para mostrar a quantidade de rotas realizadas */}
             <Form.Label className="w-100 text-orange">
               Rotas totais realizadas em todos os pontos:
             </Form.Label>
@@ -610,7 +591,6 @@ const fetchAssociacaoName = async (idAssociacao) => {
         </Row>
         <Row className="w-100 my-1">
           <Col>
-            {/* Novo campo para mostrar a quantidade de rotas realizadas */}
             <Form.Label className="w-100 text-orange">
               Rotas totais realizadas em todos os pontos:
             </Form.Label>
@@ -647,9 +627,9 @@ const fetchAssociacaoName = async (idAssociacao) => {
               Quantidade total coletado
             </Form.Label>
             <Form.Control
-              type="text" // Alterado o tipo para texto
+              type="text"
               className="form-control custom-focus"
-              value={`${quantidadeTotal} kg`} // Adicionado " kg" ao valor
+              value={`${quantidadeTotal} kg`} 
               aria-label="Disabled input exampl"
               disabled
             />

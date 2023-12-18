@@ -55,7 +55,6 @@ function MudarSenha(props) {
     console.log(senha);
     if (senha === confirmarSenha) {
       try {
-        //TODO: MUDEI PARA USAR O AXIOS, VERIFIQUE SE ESTA FUNCIONADO DA MESMA FORMA
         const response = await API.put(
           "/users/update/password",
           {
@@ -63,13 +62,11 @@ function MudarSenha(props) {
           },
           {
             headers: {
-              "Content-Type": "application/json", //TODO: GERALMENTE NÃO PRECISA DEFINIR O CONTENT-TYPE
-              //POIS CREIO QUE POR DEFAULT O AXIOS JA SEJA ESSE CONTENT-TYPE
+              "Content-Type": "application/json", 
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        //TODO: NAO PRECISA DO IF, POIS QUANDO CAI NO TRY, ELE JA SERÁ UM 200
         if (response.status === 200) {
           toast.success("Senha alterada com sucesso");
           setSenha("");
@@ -182,7 +179,6 @@ function MudarEmail(props) {
     const token = autenticacao.token;
 
     if (email === confirmarEmail) {
-      //TODO: MUDEI PARA USAR O AXIOS, VERIFIQUE SE ESTA FUNCIONADO DA MESMA FORMA
 
       try {
         const response = await API.put(
@@ -192,14 +188,12 @@ function MudarEmail(props) {
           },
           {
             headers: {
-              "Content-Type": "application/json", //TODO: GERALMENTE NÃO PRECISA DEFINIR O CONTENT-TYPE
-              //POIS CREIO QUE POR DEFAULT O AXIOS JA SEJA ESSE CONTENT-TYPE
+              "Content-Type": "application/json", 
               Authorization: `Bearer ${token}`,
             },
           }
         );
 
-        //TODO: NAO PRECISA DO IF, POIS QUANDO CAI NO TRY, ELE JA SERÁ UM 200
         if (response.status === 200) {
           toast.success("email alterado com sucesso");
           setEmail("");
@@ -305,7 +299,7 @@ function Perfil() {
         <Row className="border bg-white rounded-5 shadow mt-5 w-100 justify-content-center p-5">
           <div className="text-center d-flex flex-column align-items-center">
             <Image
-              src={fotoPerfil[func]} // Selecionar a imagem correta com base em 'func'
+              src={fotoPerfil[func]}
               roundedCircle
               alt="Foto de Perfil"
               className="img-fluid perfil"

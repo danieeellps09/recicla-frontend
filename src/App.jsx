@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ListaCatador from "./pages/lista-catador";
 import Login from "./pages/login";
-import AcompanhamentoColeta from "./pages/acompanhamento-coleta";
 import Header from "./components/header";
 import HeaderLogin from "./components/header-login";
 import Admin from "./pages/admin";
@@ -21,7 +20,6 @@ import RelatorioColeta from "./pages/relatorio-coleta";
 import RelatorioVenda from "./pages/relatorio-venda";
 import ListaRelatorioColeta from "./pages/lista-relatorio-coleta";
 import ListaRelatorioVenda from "./pages/lista-relatorio-venda";
-import ListarAdministradores from "./pages/lista-adm"; //TODO: NÃO ESTA SENDO UTILIZADO
 import ListarAssociacoes from "./pages/lista-associacao";
 import ListarTodosCatadores from "./pages/lista-catador-adm";
 import PaginaNaoEncontrada from "./pages/pagina-nao-encontrada";
@@ -34,7 +32,6 @@ import ListarColetasCatador from "./pages/lista-coleta-catador";
 import RelatorioColetaAdm from "./pages/relatorio-coleta-adm";
 import RelatorioVendaAdm from "./pages/relatorio-venda-adm";
 
-//TODO:  PODE SER SUBSTITUIDO POR <>...</> NAS NOVA VERSÕES DO REACT. IGUAL EU FIZ ABAIXO
 
 function App() {
   return (
@@ -105,15 +102,7 @@ function App() {
                 </>
               }
             />
-            <Route
-              path="/test"
-              element={
-                <>
-                  <Header />
-                  <AcompanhamentoColeta />
-                </>
-              }
-            />
+            
           </Route>
 
           {/* Rota ASSOCIAÇÃO */}
@@ -261,7 +250,7 @@ function App() {
           {/* Rota LOGISTICA */}
           <Route path="/" element={<ProtecaoLogistica />}>
             <Route
-              path="/perfil-logistica"
+              path="/perfil-operador"
               element={
                 <>
                   <Header />
@@ -269,13 +258,7 @@ function App() {
                 </>
               }
             />
-            {/* TODO: REMOVER CODIGO COMENTADO */}
-            {/* <Route path="/lista-coleta" element={<><Header /><ListaColeta /></>} />
-          <Route path="/lista-venda" element={<><Header /><ListaVenda /></>} />
-          <Route path="/lista-relatorio-coleta" element={<><Header /><ListaRelatorioColeta /></>} />
-          <Route path="/lista-relatorio-venda" element={<><Header /><ListaRelatorioVenda /></>} />
-          <Route path="/relatorio-coleta-adm" element={<><Header /><RelatorioColetaAdm /></>} />
-          <Route path="/relatorio-venda-adm" element={<><Header /><RelatorioVendaAdm/></>} /> */}
+          
           </Route>
 
           <Route

@@ -4,7 +4,6 @@ import { BsArrowLeftShort, BsDownload, BsEyeFill } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Autenticacao } from "../config/Autenticacao";
 import { API } from "../services/api";
-import * as XLSX from "xlsx";
 
 
 function ListaRelatorioColeta() {
@@ -14,7 +13,6 @@ function ListaRelatorioColeta() {
   const [catadores, setCatadores] = useState([]);
   const [selectedCatador, setSelectedCatador] = useState(null);
   const [visualSelectedCatador, setVisualSelectedCatador] = useState("");
-  const [idCatador, setIdCatador] = useState("");
 
   const autenticacao = Autenticacao();
   const token = autenticacao.token;
@@ -35,11 +33,9 @@ function ListaRelatorioColeta() {
 
   useEffect(() => {
     fetchCatadores();
-  }, []); // Carregar a lista de catadores quando o componente for montado
+  }, []); 
 
-  //TODO: 'handleLast7Days','handleLast15Days', 'handleLast30Days' E 'formatDate'.COMO DISSE EM OUTRAS PARTES DO CODIGO, PODE SER DEFINIDO ESSAS FUNCOES COMO
-  //UTILITARIAS, OU SEJA CRIE UM ARQUIVO PARA ELAS E IMPORTE-AS QUANDO PRECISAR, ISSO EVITA
-  //REPETICAO DE CODIGO
+
 
   const handleLast7Days = () => {
     const today = new Date();
@@ -161,7 +157,6 @@ function ListaRelatorioColeta() {
             </Col>
           </Row>
 
-          {/* TODO: DARIA PRA REFATORAR ESSES ITENS ABAIXO, COMO FIZ EM ALGUMAS TELAS*/}
           <Row className="justify-content-evenly mt-2">
             <Form.Label className="text-orange mt-2 ps-1">
               Escolha um Período
@@ -208,7 +203,6 @@ function ListaRelatorioColeta() {
             </Col>
           </Row>
 
-          {/* Dropdown para selecionar catador */}
 
           <div className="mt-5 d-flex center justify-content-evenly">
             <Button

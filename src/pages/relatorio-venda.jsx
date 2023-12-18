@@ -4,22 +4,17 @@ import {
   Col,
   Container,
   Row,
-  Image,
-  Dropdown,
   Form,
-  Stack,
   Modal
 } from "react-bootstrap";
 import "../style/css.css";
 import {
   BsArrowLeftShort,
   BsDownload,
-  BsEyeFill,
   BsCaretRightFill,
-} from "react-icons/bs"; //TODO:  'BsEyeFill' NÃO ESTA SENDO USADO
+} from "react-icons/bs"; 
 import { useLocation, useNavigate } from "react-router-dom";
 import { Autenticacao } from "../config/Autenticacao";
-import { id } from "date-fns/locale";
 import { API } from "../services/api";
 import html2pdf from 'html2pdf.js';
 import ResumoVenda from "../models/resumoVendas";
@@ -27,14 +22,11 @@ import ResumoVenda from "../models/resumoVendas";
 function RelatorioVenda() {
   const [associacaoName, setAssociacaoName] = useState("");
   const [materiaisVendidos, setMateriaisVendidos] = useState([]);
-  const [quantidadeMateriaisVendidos, setQuantidadeMateriaisVendidos] =
-    useState(0); //TODO:  'STATE E SETSTATE' NÃO ESTA SENDO USADO
-  const [pesoTotalComercializado, setPesoTotalComercializado] = useState(0); //TODO:  'STATE E SETSTATE' NÃO ESTA SENDO USADO
   const [idAssociacao, setIdAssociacao] = useState("");
    const [showCheckModal, setShowCheckModal] = useState(false);
    const [associacaoInfo, setAssociacaoInfo] = useState({})
 
-  const [completo, setCompleto] = useState(false); //TODO:  'SETSTATE' NÃO ESTA SENDO USADO
+  const [completo, setCompleto] = useState(false); 
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -207,7 +199,7 @@ function RelatorioVenda() {
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       };
   
-      const pdfContentPromise = formatarColetasFrontend({
+      const pdfContentPromise = formatarVendasFrontend({
         vendas: vendasData,
         associacao: associacaoDetails,
         startDate: formatarData(dataInicialParam),
@@ -231,7 +223,7 @@ function RelatorioVenda() {
   };
   
 
-  const formatarColetasFrontend = async ({ vendas, associacao, startDate, endDate, resumoVendas }, completo) => {
+  const formatarVendasFrontend = async ({ vendas, associacao, startDate, endDate, resumoVendas }, completo) => {
   
     const style = `<style type="text/css">
   *{

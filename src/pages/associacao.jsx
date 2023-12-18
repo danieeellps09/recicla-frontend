@@ -1,14 +1,10 @@
 import React from "react";
 import { Button, Col, Container, Row, Image } from "react-bootstrap";
 import {
-  BsPeopleFill,
-  BsRecycle,
   BsBicycle,
-  BsShareFill,
   BsBarChartFill,
-  BsCoin,
   BsFillFileEarmarkFill,
-} from "react-icons/bs"; //TODO: 'BsPeopleFill', 'BsRecycle', 'BsShareFill' E 'BsCoin' NÃO ESTAO SENDO USADOS
+} from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import TelaAdmin from "../images/telaadmin.svg";
 import "../style/css.css";
@@ -44,8 +40,7 @@ function Associacao() {
               <span style={{ color: "#EF7A2A" }}>ASSOCIAÇÃO</span> da
               plataforma.
             </h5>
-            {/* TODO: DARIA PARA APLICAR UMA REFATORACO NOS BOTOES ABAIXO, IGUAL EU
-            REALIZEI EM OUTRAS TELAS, CASO QUEIRA */}
+
             <Button
               onClick={linkListaCatador}
               type="submit"

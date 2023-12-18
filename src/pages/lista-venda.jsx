@@ -31,8 +31,7 @@ import { Autenticacao } from "../config/Autenticacao";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Adicionar = (props) => {
-    const [cpf, setCpf] = useState("");
-    const [telefone, setTelefone] = useState("");
+  
 
     return (
         <Modal
@@ -158,8 +157,7 @@ const Adicionar = (props) => {
 };
 
 const Visualizar = (props) => {
-    const [cpf, setCpf] = useState("");
-    const [telefone, setTelefone] = useState("");
+
 
     return (
         <Modal
@@ -275,11 +273,9 @@ function ListaVenda() {
     const [catadorData, setCatadorData] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
 
-    // Token de autenticação
     const autenticacao = Autenticacao();
     const token = autenticacao.token;
 
-    // Configuração do cabeçalho com o token
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -287,10 +283,9 @@ function ListaVenda() {
     };
 
     useEffect(() => {
-        // Fazendo a chamada para o backend para obter os dados do catador
         axios
             .get(
-                "http://18.219.127.240:3000/api/v1/catadores/pega-catadores/associacao",
+                "https://reciclo.api-reciclo.free.nf/api/v1/catadores/pega-catadores/associacao",
                 config
             )
             .then((response) => {
@@ -310,22 +305,18 @@ function ListaVenda() {
     const showModalAdicionar = () => setModalAdicionar(true);
     const hideModalAdicionar = () => setModalAdicionar(false);
 
-    // Função para paginar os resultados
     const paginateResults = (data, page, resultsPerPage) => {
         const startIndex = (page - 1) * resultsPerPage;
         const endIndex = startIndex + resultsPerPage;
         return data.slice(startIndex, endIndex);
     };
 
-    // Definimos a quantidade de resultados por página
     const resultsPerPage = 2;
 
-    // Filtramos os resultados da página atual
     const currentResults = catadorData
         ? paginateResults(catadorData, currentPage, resultsPerPage)
         : [];
 
-    // Calculamos o número total de páginas
     const totalPages = catadorData
         ? Math.ceil(catadorData.length / resultsPerPage)
         : 0;
@@ -391,30 +382,7 @@ function ListaVenda() {
                             </div>
                         </ListGroup.Item>
 
-                        {/* 
-                        {currentResults.map((catador, index) => (
-                            <ListGroup.Item
-                                key={index}
-                                action
-                                as="li"
-                                className="d-flex justify-content-between align-items-start"
-                            >
-                                <div className='ms-2 me-auto'>
-                                    <div className="fw-bold">{catador.user.name}</div>
-                                    CPF: {catador.cpf} <br />
-                                    Email: {catador.user.email}
-                                </div>
-                                <div>
-                                    <Button type='submit' className="mx-2 btn-orange" >
-                                        <BsPen /> Editar
-                                    </Button>
-                                    <Button type='submit' className="btn-orange" >
-                                        <BsTrash /> Excluir
-                                    </Button>
-                                </div>
-                            </ListGroup.Item>
-                        ))}
-                        */}
+                     
                     </ListGroup>
 
                     <Pagination className="pagination-orange mt-3 justify-content-center">

@@ -4,10 +4,9 @@ import {
   Col,
   Container,
   Row,
-  Image,
-  Dropdown,
+
   Form,
-  Stack,
+  
   Modal
 } from "react-bootstrap";
 import "../style/css.css";
@@ -23,9 +22,7 @@ import { API } from "../services/api";
 import ResumoColeta from "../models/resumoColetas";
 import * as XLSX from "xlsx";
 import html2pdf from 'html2pdf.js';
-import jsPDF from 'jspdf';
 
-import { saveAs } from 'file-saver';
 
 
 function RelatorioColetaAdm() {
@@ -33,7 +30,6 @@ function RelatorioColetaAdm() {
   const [funcaoName, setFuncaoName] = useState("");
   const [associacaoName, setAssociacaoName] = useState("");
 
-  const [veiculos, setVeiculos] = useState([]);
   const [quantidadeTotal, setQuantidadeTotal] = useState(0);
   const [rotasTotais, setRotasTotais] = useState(0);
   const [veiculosUtilizados, setVeiculosUtilizados] = useState([]);
@@ -41,7 +37,6 @@ function RelatorioColetaAdm() {
   const [idCatador, setIdCatador] = useState("");
   const [cnpj, setCnpj] = useState("");
   const [cpf, setCatadorCpf] = useState("");
-  const [showCheckbox, setShowCheckbox] = useState(false);
   const [showCheckModal, setShowCheckModal] = useState(false);
 
   const [completo, setCompleto] = useState(true);
@@ -208,28 +203,8 @@ function RelatorioColetaAdm() {
     fetchData();
   }, [idCatador, coletas]);
 
-
-
-  // const handleDownloadPDF = async () => {
-  //   try {
-  //     const downloadURL = `/pdf/coleta/${idCatador}?completo=${completo}&datainicio=${formatarData(
-  //       dataInicialParam
-  //     )}&datafim=${formatarData(dataFinalParam)}`;
-
-  //     window.open(downloadURL, "_blank");
-  //   } catch (error) {
-  //     console.error("Erro ao baixar o relatório:", error);
-  //   }
-  // };
-
-  // Fun
-
-  //
-
-
   const handleConfirmPDF = async () => {
     try {
-      // Abra o modal aqui, antes de iniciar qualquer lógica
       setShowCheckModal(true);
     } catch (error) {
       console.error('Erro ao baixar o relatório:', error);
@@ -295,7 +270,7 @@ function RelatorioColetaAdm() {
   
 
   const formatarColetasFrontend = async ({ coletas, catador, startDate, endDate, resumoColetas }, completo) => {
-    // Sua lógica de estilos aqui
+    
     const style = `<style type="text/css">
   *{
       margin:0;
@@ -418,8 +393,7 @@ function RelatorioColetaAdm() {
           associacaoInfo = await fetchAssociacaoName(coleta.idAssociacao);
         }
 
-        console.log(catador);
-        console.log(associacaoInfo)
+        
         const coletaFormatada = `
       <div class="container">
         ${coleta.idCatador != null
@@ -594,7 +568,6 @@ function RelatorioColetaAdm() {
         </Row>
         <Row className="w-100 my-1">
           <Col>
-            {/* Novo campo para mostrar a quantidade de rotas realizadas */}
             <Form.Label className="w-100 text-orange">
               Rotas totais realizadas em todos os pontos:
             </Form.Label>

@@ -4,24 +4,17 @@ import {
   Button,
   Col,
   Container,
-  Image,
   Row,
-  FormControl,
-  Dropdown,
+
 } from "react-bootstrap";
-import fotoPerfil from "../images/perfil.jpg";
 
 import "../style/css.css";
 import {
   BsArrowLeftShort,
-  BsCalendar,
-  BsDownload,
-  BsEye,
   BsEyeFill,
 } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Autenticacao } from "../config/Autenticacao";
-import RelatorioColeta from "./relatorio-coleta";
 
 import { API } from "../services/api";
 
@@ -66,7 +59,6 @@ function ListaRelatorioColetaCatador() {
       return `${day}/${month}/${year}`;
     }
 
-    // Se o formato não for reconhecido, retorna o formato padrão.
     return `${year}-${month}-${day}`;
   };
 
@@ -78,7 +70,6 @@ function ListaRelatorioColetaCatador() {
   const autenticacao = Autenticacao();
   const token = autenticacao.token;
 
-  // Configuração do cabeçalho com o token
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -101,7 +92,6 @@ function ListaRelatorioColetaCatador() {
           },
         }
       );
-      //   setShowRelatorio(true);
       let catadorId = 0
       if (response.data.length > 0) {
          catadorId = response.data[0].idCatador;
@@ -124,7 +114,7 @@ function ListaRelatorioColetaCatador() {
   const handleDownloadPDF = async () => {
     try {
       const response = await API.get(
-        `/pdf/coleta-catador`, // Supondo que você deseja usar o ID da primeira venda
+        `/pdf/coleta-catador`, 
         {
           params: {
             completo: true,

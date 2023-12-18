@@ -10,12 +10,10 @@ import {
   Row,
   Modal,
   Form,
-  FormLabel,
-  Dropdown,
+ 
 } from "react-bootstrap";
 import InputMask from "react-input-mask";
 import {
-  BsFilePlus,
   BsPen,
   BsPeopleFill,
   BsPlusCircleFill,
@@ -59,12 +57,10 @@ const AdicionarOperadorLogistico = (props) => {
       },
       cpf: cpf,
     };
-    console.log(dataToSend);
 
     API.post("/operador-logistico", dataToSend)
       .then((response) => {
         if (response && response.data) {
-          console.log("Operador criado com sucesso:", response.data);
           setNome("");
           setEmail("");
           setCpf("");
@@ -155,9 +151,7 @@ function EditarOperadorLogistico(props) {
 
   const [operador, setOperador] = useState(null);
 
-  const [operadorSelecionadoId, setOperadorSelecionadoId] = useState(
-    props.operadorId
-  );
+  
 
   useEffect(() => {
     const fetchData = async (url, setterFunction) => {
@@ -186,18 +180,15 @@ function EditarOperadorLogistico(props) {
         status: true,
       },
     };
-    console.log(dataToSend);
-    console.log(props.operadorId);
+   
     API.put(`/operador-logistico/${props.operadorId}`, dataToSend)
       .then((response) => {
         if (response && response.data) {
-          console.log("Operador atualizado com sucesso:", response.data);
           toast.success("Operador atualizado com sucesso");
           props.onHide();
 
           setOperador(response.data);
           window.location.reload();
-          console.log("Após a atualização do estado operador:", operador);
         } else {
           console.error("Resposta inválida ao atualizar operador:", response);
         }
@@ -284,7 +275,6 @@ function ListarOperadorLogistico() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-  console.log(operadorData);
 
   const handleExcluirOperador = (operadorId) => {
     setOperadorData((prevOperadores) =>
@@ -364,11 +354,9 @@ function ListarOperadorLogistico() {
     setShowConfirmacaoModal(false);
   };
 
-  // Token de autenticação
   const autenticacao = Autenticacao();
   const token = autenticacao.token;
 
-  // Configuração do cabeçalho com o token
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -393,24 +381,17 @@ function ListarOperadorLogistico() {
       });
   }, [searchQuery]);
 
-  const [modalShow, setModalShow] = React.useState(false);
 
-  // Função para paginar os resultados
   const paginateResults = (data, page, resultsPerPage) => {
     const startIndex = (page - 1) * resultsPerPage;
     const endIndex = startIndex + resultsPerPage;
     return data.slice(startIndex, endIndex);
   };
 
-  // Definimos a quantidade de resultados por página
   const resultsPerPage = 5;
 
-  // Filtramos os resultados da página atual
-  const currentResults = operadorData
-    ? paginateResults(operadorData, currentPage, resultsPerPage)
-    : [];
+ 
 
-  // Calculamos o número total de páginas
   const totalPages = operadorData
     ? Math.ceil(operadorData.length / resultsPerPage)
     : 0;

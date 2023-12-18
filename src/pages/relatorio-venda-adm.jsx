@@ -4,19 +4,15 @@ import {
   Col,
   Container,
   Row,
-  Image,
-  Dropdown,
   Form,
-  Stack,
   Modal
 } from "react-bootstrap";
 import "../style/css.css";
 import {
   BsArrowLeftShort,
   BsDownload,
-  BsEyeFill,
   BsCaretRightFill,
-} from "react-icons/bs"; //TODO:  'BsEyeFill' NÃO ESTA SENDO USADO
+} from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Autenticacao } from "../config/Autenticacao";
 import { id } from "date-fns/locale";
@@ -27,13 +23,11 @@ import ResumoVenda from "../models/resumoVendas";
 function RelatorioVendaAdm() {
   const [associacaoName, setAssociacaoName] = useState("");
   const [materiaisVendidos, setMateriaisVendidos] = useState([]);
-  const [quantidadeMateriaisVendidos, setQuantidadeMateriaisVendidos] =
-    useState(0); //TODO:  'STATE E SETSTATE' NÃO ESTA SENDO USADO
-  const [pesoTotalComercializado, setPesoTotalComercializado] = useState(0); //TODO:  'STATE E SETSTATE' NÃO ESTA SENDO USADO
+  
   const [idAssociacao, setIdAssociacao] = useState("");
    const [showCheckModal, setShowCheckModal] = useState(false);
 
-  const [completo, setCompleto] = useState(false); //TODO:  'SETSTATE' NÃO ESTA SENDO USADO
+  const [completo, setCompleto] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,9 +36,7 @@ function RelatorioVendaAdm() {
   const dataInicialParam = location.state?.startDate || "";
   const dataFinalParam = location.state?.endDate || "";
 
-  //TODO:  'formatarData' E 'formatarDataHora' PODE SER FUNCOES UNITARIAS GLOBAIS
-  //POIS VI QUE VC ESTA USANDO EM VARIOS LUGARES. PODERIA CRIAR ELAS GLOBALMENTE EM UM ARQUIVO
-  //E APENAS IMPORTAR-LAS
+
   const formatarData = (data) => {
     const dataObj = new Date(data);
     const dia = String(dataObj.getDate()).padStart(2, "0");
@@ -205,7 +197,7 @@ function RelatorioVendaAdm() {
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       };
   
-      const pdfContentPromise = formatarColetasFrontend({
+      const pdfContentPromise = formatarVendasFrontend({
         vendas: vendasData,
         associacao: associacaoDetails,
         startDate: formatarData(dataInicialParam),
@@ -229,7 +221,7 @@ function RelatorioVendaAdm() {
   };
   
 
-  const formatarColetasFrontend = async ({ vendas, associacao, startDate, endDate, resumoVendas }, completo) => {
+  const formatarVendasFrontend = async ({ vendas, associacao, startDate, endDate, resumoVendas }, completo) => {
   
     const style = `<style type="text/css">
   *{

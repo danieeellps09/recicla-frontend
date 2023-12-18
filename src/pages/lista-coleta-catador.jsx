@@ -92,7 +92,6 @@ const AdicionarColeta = (props) => {
     const autenticacao = Autenticacao();
     const token = autenticacao.token;
 
-    // Configuração do cabeçalho com o token
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -274,7 +273,7 @@ const Visualizar = (props) => {
   const [coleta, setColeta] = useState(null);
   const [coletaSelecionadoId, setColetaSelecionadoId] = useState(
     props.idColeta
-  ); // Utilizando o ID do catador passado como prop
+  ); 
 
   useEffect(() => {
     const fetchData = async (url, setterFunction) => {
@@ -416,11 +415,10 @@ const Visualizar = (props) => {
 function ListarColetasCatador() {
   const [coletaData, setColetaData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [coletaSelecionadoId, setColetaSelecionadaId] = useState(null); // Adicionando estado para o ID do catador selecionado
+  const [coletaSelecionadoId, setColetaSelecionadaId] = useState(null); 
   const [modalAdicionarShow, setModalAdicionarShow] = useState(false);
   const [modalVisualizarShow, setModalVisualizarShow] = useState(false);
   const [showConfirmacaoModal, setShowConfirmacaoModal] = useState(false);
-  // Estado para armazenar o ID do catador a ser excluído
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
@@ -435,11 +433,9 @@ function ListarColetasCatador() {
         return idMatches || dataColetaMatches || quantidadeMatches;
       })
     : [];
-  // Token de autenticação
   const autenticacao = Autenticacao();
   const token = autenticacao.token;
 
-  // Configuração do cabeçalho com o token
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -472,22 +468,16 @@ function ListarColetasCatador() {
   const showModalAdicionar = () => setModalAdicionar(true);
   const hideModalAdicionar = () => setModalAdicionar(false);
 
-  // Função para paginar os resultados
   const paginateResults = (data, page, resultsPerPage) => {
     const startIndex = (page - 1) * resultsPerPage;
     const endIndex = startIndex + resultsPerPage;
     return data.slice(startIndex, endIndex);
   };
 
-  // Definimos a quantidade de resultados por página
   const resultsPerPage = 5;
 
-  // Filtramos os resultados da página atual
-  const currentResults = coletaData
-    ? paginateResults(coletaData, currentPage, resultsPerPage)
-    : [];
+ 
 
-  // Calculamos o número total de páginas
   const totalPages = coletaData
     ? Math.ceil(coletaData.length / resultsPerPage)
     : 0;

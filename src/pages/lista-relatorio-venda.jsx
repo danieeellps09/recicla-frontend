@@ -4,19 +4,13 @@ import {
   Button,
   Col,
   Container,
-  Image,
   Row,
-  FormControl,
   Dropdown,
 } from "react-bootstrap";
-import fotoPerfil from "../images/perfil.jpg";
 
 import "../style/css.css";
 import {
   BsArrowLeftShort,
-  BsCalendar,
-  BsDownload,
-  BsEye,
   BsEyeFill,
 } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -83,7 +77,6 @@ function ListaRelatorioVendaAssociacao() {
       return `${day}/${month}/${year}`;
     }
 
-    // Se o formato não for reconhecido, retorna o formato padrão.
     return `${year}-${month}-${day}`;
   };
 
@@ -141,7 +134,7 @@ function ListaRelatorioVendaAssociacao() {
   const handleDownloadPDF = async () => {
     try {
       const response = await API.get(
-        `/pdf/venda/${selectedAssociacao}`, // Supondo que você deseja usar o ID da primeira venda
+        `/pdf/venda/${selectedAssociacao}`, 
         {
           params: {
             completo: true,

@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   Col,
   Container,
@@ -10,9 +9,8 @@ import {
   Row,
   Modal,
   Form,
-  FormLabel,
-  Dropdown,
-} from "react-bootstrap"; //TODO:'FormLabel', 'Dropdown'e 'Badge' NÃO ESTAO SENDO USADOS
+
+} from "react-bootstrap"; 
 import InputMask from "react-input-mask";
 import {
   BsFilePlus,
@@ -21,7 +19,7 @@ import {
   BsPlusCircleFill,
   BsSearch,
   BsTrash,
-} from "react-icons/bs"; //TODO:'BsFilePlus' NÃO ESTA SENDO USADO
+} from "react-icons/bs";
 import "../style/css.css";
 import { useEffect } from "react";
 import { Autenticacao } from "../config/Autenticacao";
@@ -38,17 +36,7 @@ const AdicionarAdministrador = (props) => {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
 
-  useEffect(() => {
-    //TODO:'fetchData' NÃO ESTA SENDO CHAMADO
-    const fetchData = async (url, setterFunction) => {
-      try {
-        const response = await API.get(url);
-        setterFunction(response.data);
-      } catch (error) {
-        console.error("Erro ao obter dados:", error);
-      }
-    };
-  }, []);
+
 
   const handleSubmit = () => {
     const dataToSend = {
@@ -65,7 +53,6 @@ const AdicionarAdministrador = (props) => {
     API.post("/administrador", dataToSend)
       .then((response) => {
         if (response && response.data) {
-          console.log("Administrador criado com sucesso:", response.data);
           setNome("");
           setEmail("");
           setCpf("");
@@ -81,7 +68,6 @@ const AdicionarAdministrador = (props) => {
         }
       })
       .catch((error) => {
-        console.error("Erro ao criar Administrador:", error.response.data);
         const errorMessage =
           error.response.data && error.response.data.message
             ? error.response.data.message
@@ -103,7 +89,6 @@ const AdicionarAdministrador = (props) => {
       </Modal.Header>
       <Modal.Body>
         <Form>
-          {/* TODO: CASO QUEIRA, DA PRA REFATORAR OS ITENS ABAIXO */}
           <Form.Label className="text-orange">Nome Completo</Form.Label>
           <FormControl
             className="form-control custom-focus"
@@ -155,9 +140,6 @@ function EditarAdministrador(props) {
 
   const [administrador, setAdministrador] = useState(null);
 
-  const [administradorSelecionadoId, setAdministradorSelecionadoId] = useState(
-    props.administradorId
-  );
 
   useEffect(() => {
     const fetchData = async (url, setterFunction) => {
@@ -191,16 +173,12 @@ function EditarAdministrador(props) {
     API.put(`/administrador/${props.administradorId}`, dataToSend)
       .then((response) => {
         if (response && response.data) {
-          console.log("Administrador atualizado com sucesso:", response.data);
           toast.success("Administrador atualizado com sucesso");
           props.onHide();
 
           setAdministrador(response.data);
           window.location.reload();
-          console.log(
-            "Após a atualização do estado administrador:",
-            administrador
-          );
+         
         } else {
           console.error(
             "Resposta inválida ao atualizar administrador:",
@@ -371,11 +349,9 @@ function ListarAdministradores() {
     setShowConfirmacaoModal(false);
   };
 
-  // Token de autenticação
   const autenticacao = Autenticacao();
   const token = autenticacao.token;
 
-  // Configuração do cabeçalho com o token
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -402,22 +378,16 @@ function ListarAdministradores() {
 
   const [modalShow, setModalShow] = React.useState(false);
 
-  // Função para paginar os resultados
   const paginateResults = (data, page, resultsPerPage) => {
     const startIndex = (page - 1) * resultsPerPage;
     const endIndex = startIndex + resultsPerPage;
     return data.slice(startIndex, endIndex);
   };
 
-  // Definimos a quantidade de resultados por página
   const resultsPerPage = 5;
 
-  // Filtramos os resultados da página atual
-  const currentResults = administradorData
-    ? paginateResults(administradorData, currentPage, resultsPerPage)
-    : [];
 
-  // Calculamos o número total de páginas
+
   const totalPages = administradorData
     ? Math.ceil(administradorData.length / resultsPerPage)
     : 0;

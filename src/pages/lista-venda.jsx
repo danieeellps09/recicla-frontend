@@ -43,7 +43,7 @@ const AdicionarVenda = (props) => {
             }
         };
 
-        fetchData("/api/v1/material", setMateriais);
+        fetchData("/material", setMateriais);
     }, []);
 
     const handleMaterialChange = (material) => {
@@ -82,7 +82,7 @@ const AdicionarVenda = (props) => {
             },
         };
 
-        API.post("/api/v1/forms/venda", dataToSend, config)
+        API.post("/forms/venda", dataToSend, config)
             .then((response) => {
                 if (response && response.data) {
                     setEmpresaCompradora("");

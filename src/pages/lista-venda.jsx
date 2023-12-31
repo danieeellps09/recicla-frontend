@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Badge,
     Button,
@@ -15,169 +15,257 @@ import {
     Dropdown,
 } from "react-bootstrap";
 import InputMask from "react-input-mask";
-import {
-    BsFilePlus,
-    BsPen,
-    BsPeopleFill,
-    BsPlusCircleFill,
-    BsSearch,
-    BsEyeFill,
-} from "react-icons/bs";
-import "../style/css.css";
-import axios from "axios";
-import { useEffect } from "react";
-import { Autenticacao } from "../config/Autenticacao";
+import { BsSearch, BsEyeFill, BsPlusCircleFill } from "react-icons/bs";
+import toast from "react-hot-toast";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import { format } from "date-fns";
+import { API } from "../services/api";
+import { Autenticacao } from "../config/Autenticacao";
 
-const Adicionar = (props) => {
-  
+const AdicionarVenda = (props) => {
+    const [empresaCompradora, setEmpresaCompradora] = useState("");
+    const [notaFiscal, setNotaFiscal] = useState("");
+    const [dataVenda, setDataVenda] = useState("");
+    const [produtos, setProdutos] = useState([]);
+    const [materiais, setMateriais] = useState([]);
+    const [selectedMaterial, setSelectedMaterial] = useState("");
+    const [quantidade, setQuantidade] = useState("");
+    const [visualSelectedMaterial, setVisualSelectedMaterial] = useState("");
+
+    useEffect(() => {
+        const fetchData = async (url, setterFunction) => {
+            try {
+                const response = await API.get(url);
+                setterFunction(response.data);
+            } catch (error) {
+                console.error("Erro ao obter dados:", error);
+            }
+        };
+
+        fetchData("/api/v1/material", setMateriais);
+    }, []);
+
+    const handleMaterialChange = (material) => {
+        setSelectedMaterial(material);
+        setVisualSelectedMaterial(material.nome);
+    };
+
+    const handleAddProduto = () => {
+        if (selectedMaterial && quantidade) {
+            const newProduto = {
+                idMaterial: selectedMaterial.id,
+                nomeMaterial: selectedMaterial.nome,
+                quantidade: parseFloat(quantidade),
+            };
+
+            setProdutos([...produtos, newProduto]);
+            setVisualSelectedMaterial("");
+            setQuantidade("");
+        }
+    };
+
+    const handleSubmit = () => {
+        const dataToSend = {
+            empresaCompradora,
+            notaFiscal,
+            dataVenda,
+            produtos,
+        };
+
+        const autenticacao = Autenticacao();
+        const token = autenticacao.token;
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+
+        API.post("/api/v1/forms/venda", dataToSend, config)
+            .then((response) => {
+                if (response && response.data) {
+                    setEmpresaCompradora("");
+                    setNotaFiscal("");
+                    setDataVenda("");
+                    setProdutos([]);
+                    toast.success("Venda adicionada com sucesso!");
+                    props.onHide();
+                    window.location.reload();
+                } else {
+                    console.error("Resposta inválida ao adicionar venda:", response);
+                    toast.error(
+                        "Erro ao adicionar venda. Resposta inválida do servidor."
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Erro ao adicionar venda:", error.response.data);
+                const errorMessage =
+                    error.response.data && error.response.data.message
+                        ? error.response.data.message
+                        : "Erro desconhecido ao adicionar venda.";
+
+                toast.error(`Erro ao adicionar venda: ${errorMessage}`);
+            });
+    };
 
     return (
-        <Modal
-            {...props}
-            size="lg"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-        >
+        <Modal {...props} size="lg" centered>
             <Modal.Header closeButton>
-                <Modal.Title style={{ color: "#EF7A2A" }}>
-                    Adiconar Formulario
-                </Modal.Title>
+                <Modal.Title style={{ color: "#EF7A2A" }}>Adicionar Venda</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Row className="w-100 my-1">
+                <Row className="w-100 my-3">
                     <Form>
-                        <Form.Group>
-                            <Form.Label className="text-orange">Associação </Form.Label>
-                            <Form.Control type="text" className="form-control custom-focus" />
-                        </Form.Group>
+                        <Form.Label className="text-orange">
+                            Empresa Compradora:{" "}
+                        </Form.Label>
+                        <Form.Control
+                            type="text"
+                            className="form-control custom-focus"
+                            value={empresaCompradora}
+                            onChange={(e) => setEmpresaCompradora(e.target.value)}
+                        />
                     </Form>
                 </Row>
-
                 <Row className="w-100 my-3">
                     <Col>
-                        <Form.Label className="w-100 text-orange">Rota</Form.Label>
-                        <Form.Control type="number" className="form-control custom-focus" />
+                        <Form.Label className="text-orange">Nota Fiscal: </Form.Label>
+                        <Form.Control
+                            type="text"
+                            className="form-control custom-focus"
+                            value={notaFiscal}
+                            onChange={(e) => setNotaFiscal(e.target.value)}
+                        />
                     </Col>
                     <Col>
-                        <Form.Label className="text-orange">
-                            Quantidade de residíduos coletados:{" "}
-                        </Form.Label>
-                        <Form.Label className="d-flex align-items-center text-orange">
-                            <Form.Control
-                                type="number"
-                                className="form-control custom-focus"
-                            />
-                        </Form.Label>
+                        <Form.Label className="text-orange">Data da Venda: </Form.Label>
+                        <InputMask
+                            mask="99/99/9999"
+                            maskChar="_"
+                            value={dataVenda}
+                            onChange={(e) => setDataVenda(e.target.value)}
+                        >
+                            {() => (
+                                <Form.Control
+                                    type="text"
+                                    className="form-control custom-focus"
+                                />
+                            )}
+                        </InputMask>
                     </Col>
                 </Row>
-
                 <Row className="w-100 my-3">
                     <Form>
-                        <Form.Label className="text-orange">Tipo de Veículo: </Form.Label>
+                        <Form.Label className="text-orange">Materiais: </Form.Label>
                         <Dropdown className="w-100">
                             <Dropdown.Toggle
                                 className="w-100 outline-white"
                                 id="dropdown-basic"
                             >
-                                {" "}
-                                Selecionar o tipo de veículo{" "}
+                                {visualSelectedMaterial || "Selecione um Material"}
                             </Dropdown.Toggle>
                             <Dropdown.Menu className="w-100 ">
-                                <Dropdown.Item href="#/action-1">Triciclo</Dropdown.Item>
-                                <Dropdown.Item href="#/action-2">Caminhão</Dropdown.Item>
-                                <Dropdown.Item href="#/action-3">Carroça</Dropdown.Item>
+                                {materiais.map((material) => (
+                                    <Dropdown.Item
+                                        key={material.id}
+                                        onClick={() => handleMaterialChange(material)}
+                                    >
+                                        {material.nome}
+                                    </Dropdown.Item>
+                                ))}
                             </Dropdown.Menu>
                         </Dropdown>
                     </Form>
                 </Row>
                 <Row className="w-100 my-3">
                     <Col>
-                        <Form.Label className="text-orange">
-                            {" "}
-                            Todos os pontos foram visitados?{" "}
-                        </Form.Label>
-
-                        <Dropdown className="w-100">
-                            <Dropdown.Toggle
-                                className="w-100 outline-white"
-                                id="dropdown-basic"
-                            >
-                                {" "}
-                                Selecione aqui{" "}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className="w-100 ">
-                                <Dropdown.Item href="#/action-1">Sim</Dropdown.Item>
-                                <Dropdown.Item href="#/action-2">Não</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
+                        <Form.Label className="text-orange">Quantidade: </Form.Label>
+                        <Form.Control
+                            type="number"
+                            className="form-control custom-focus"
+                            value={quantidade}
+                            onChange={(e) => setQuantidade(e.target.value)}
+                        />
                     </Col>
                     <Col>
-                        <Form.Label className="text-orange">
-                            {" "}
-                            Foi feito a coleta em todos os pontos?{" "}
-                        </Form.Label>
-
-                        <Dropdown className="w-100">
-                            <Dropdown.Toggle
-                                className="w-100 outline-white"
-                                id="dropdown-basic"
-                            >
-                                {" "}
-                                Selecione aqui{" "}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className="w-100 ">
-                                <Dropdown.Item href="#/action-1">Sim</Dropdown.Item>
-                                <Dropdown.Item href="#/action-2">Não</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
+                        <Button
+                            type="button"
+                            className="btn-orange"
+                            onClick={handleAddProduto}
+                            style={{ marginTop: "32px" }} 
+                        >
+                            Adicionar Produto
+                        </Button>
                     </Col>
                 </Row>
-
                 <Row className="w-100 my-3">
-                    <Form>
-                        <Form.Label className="text-orange"> Motivo </Form.Label>
-                        <Form.Control type="text" className="form-control custom-focus" />
-                    </Form>
+                    <Col>
+                        <Form.Label className="text-orange">Produtos Adicionados:</Form.Label>
+                        <ListGroup>
+                            {produtos.map((produto, index) => (
+                                <ListGroup.Item key={index}>
+                                    {produto.nomeMaterial} - Quantidade: {produto.quantidade}
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </Col>
                 </Row>
             </Modal.Body>
             <Modal.Footer>
                 <Button
                     type="submit"
                     className="rounded btn-orange w-100"
-                    onClick={props.onHide}
+                    onClick={handleSubmit}
                 >
-                    {" "}
-                    Enviar{" "}
+                    Enviar
                 </Button>
             </Modal.Footer>
         </Modal>
     );
 };
 
-const Visualizar = (props) => {
 
+const VisualizarVenda = (props) => {
+    const [empresaCompradora, setEmpresaCompradora] = useState("");
+    const [notaFiscal, setNotaFiscal] = useState("");
+    const [dataVenda, setDataVenda] = useState("");
+    const [produtos, setProdutos] = useState([]);
+    const [venda, setVenda] = useState(null);
+    const [vendaSelecionadaId, setVendaSelecionadaId] = useState(props.idVenda);
+
+    useEffect(() => {
+        const fetchData = async (url, setterFunction) => {
+            try {
+                const response = await API.get(url);
+                setterFunction(response.data);
+                setEmpresaCompradora(response.data.empresaCompradora);
+                setNotaFiscal(response.data.notaFiscal);
+                setDataVenda(response.data.dataVenda);
+                setProdutos(response.data.materiais);
+            } catch (error) {
+                console.error("Erro ao obter dados:", error);
+            }
+        };
+        fetchData(`/forms/venda/${props.idVenda}`, setVenda);
+    }, [props.idVenda]);
 
     return (
-        <Modal
-            {...props}
-            size="lg"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-        >
+        <Modal {...props} size="lg" centered>
             <Modal.Header closeButton>
+                <Modal.Title style={{ color: "#EF7A2A" }}>Visualizar Venda</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Row className="w-100 my-1">
                     <Form>
                         <Form.Group>
-                            <Form.Label className="text-orange">Nome do Catador: </Form.Label>
+                            <Form.Label className="text-orange">Empresa Compradora: </Form.Label>
                             <Form.Control
                                 type="text"
                                 className="form-control custom-focus"
-                                placeholder="Fualno de tal"
-                                aria-label="Disabled input exampl"
+                                aria-label="Disabled input example"
+                                value={empresaCompradora}
                                 disabled
                             />
                         </Form.Group>
@@ -185,83 +273,44 @@ const Visualizar = (props) => {
                 </Row>
 
                 <Row className="w-100 my-3">
-                    <Col>
-                        <Form.Label className="w-100 text-orange">Rota</Form.Label>
-                        <Form.Control
-                            type="number"
-                            className="form-control custom-focus"
-                            placeholder="3 rotas"
-                            aria-label="Disabled input exampl"
-                            disabled
-                        />
-                    </Col>
-                    <Col>
-                        <Form.Label className="text-orange">
-                            Quantidade de residíduos coletados:{" "}
-                        </Form.Label>
-                        <Form.Label className="d-flex align-items-center text-orange">
-                            <Form.Control
-                                type="number"
-                                className="form-control custom-focus"
-                                placeholder="0 kg"
-                                aria-label="Disabled input exampl"
-                                disabled
-                            />
-                        </Form.Label>
-                    </Col>
-                </Row>
-
-                <Row className="w-100 my-3">
                     <Form>
-                        <Form.Label className="text-orange">Tipo de Veículo: </Form.Label>
+                        <Form.Label className="text-orange">Nota Fiscal: </Form.Label>
                         <Form.Control
                             type="text"
                             className="form-control custom-focus"
-                            placeholder="Triciclo"
-                            aria-label="Disabled input exampl"
+                            aria-label="Disabled input example"
+                            value={notaFiscal}
                             disabled
                         />
                     </Form>
                 </Row>
+
                 <Row className="w-100 my-3">
-                    <Col>
-                        <Form.Label className="text-orange">
-                            {" "}
-                            Todos os pontos foram visitados?{" "}
-                        </Form.Label>
+                    <Form>
+                        <Form.Label className="text-orange">Data da Venda: </Form.Label>
                         <Form.Control
                             type="text"
                             className="form-control custom-focus"
-                            placeholder="Sim"
-                            aria-label="Disabled input exampl"
+                            value={format(new Date(dataVenda), "dd/MM/yyyy")}
+                            readOnly
                             disabled
                         />
-                    </Col>
-                    <Col>
-                        <Form.Label className="text-orange">
-                            {" "}
-                            Foi feito a coleta em todos os pontos?{" "}
-                        </Form.Label>
-                        <Form.Control
-                            type="text"
-                            className="form-control custom-focus"
-                            placeholder="Não"
-                            aria-label="Disabled input exampl"
-                            disabled
-                        />
-                    </Col>
+                    </Form>
                 </Row>
 
                 <Row className="w-100 my-3">
                     <Form>
-                        <Form.Label className="text-orange"> Motivo </Form.Label>
-                        <Form.Control
-                            type="text"
-                            className="form-control custom-focus"
-                            placeholder="O motivo fica aqui"
-                            aria-label="Disabled input exampl"
-                            disabled
-                        />
+                        <Form.Label className="text-orange">Produtos: </Form.Label>
+                        {produtos.map((produto, index) => (
+                            <Form.Control
+                                key={index}
+                                type="text"
+                                className="form-control custom-focus mb-2"
+                                value={`${produto.quantidadeVendida} kg de ${produto.nomeMaterial}`}
+                                disabled
+                                readOnly
+                            />
+                        ))}
                     </Form>
                 </Row>
             </Modal.Body>
@@ -269,9 +318,15 @@ const Visualizar = (props) => {
     );
 };
 
-function ListaVenda() {
-    const [catadorData, setCatadorData] = useState(null);
+const ListarVendas = () => {
+    const [vendaData, setVendaData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [vendaSelecionadaId, setVendaSelecionadaId] = useState(null);
+    const [modalAdicionarShow, setModalAdicionarShow] = useState(false);
+    const [modalVisualizarShow, setModalVisualizarShow] = useState(false);
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+
 
     const autenticacao = Autenticacao();
     const token = autenticacao.token;
@@ -282,28 +337,30 @@ function ListaVenda() {
         },
     };
 
+
     useEffect(() => {
-        axios
-            .get(
-                "https://reciclo.api-reciclo.free.nf/api/v1/catadores/pega-catadores/associacao",
-                config
-            )
-            .then((response) => {
-                setCatadorData(response.data);
-            })
-            .catch((error) => {
-                console.error("Erro ao obter os dados do catador:", error);
-            });
-    }, []);
+        const fetchData = async () => {
+            try {
+                const response = await API.get("/forms/venda/vendas/vendas-by-associacao", config);
+                setVendaData(response.data);
+                if (!showSuccessMessage) {
+                    toast.success("Vendas listadas com sucesso!");
+                    setShowSuccessMessage(true);
+                }
+            } catch (error) {
+                console.error("Erro ao obter dados das vendas:", error);
+                toast.error("Erro ao listar vendas. Verifique os dados e tente novamente.");
+            }
+        };
 
-    const [modalVisualizar, setModalVisualizar] = useState(false);
-    const [modalAdicionar, setModalAdicionar] = useState(false);
+        fetchData();
+    }, [searchQuery]);
 
-    const showModalVisualizar = () => setModalVisualizar(true);
-    const hideModalVisualizar = () => setModalVisualizar(false);
+    const showModalVisualizar = () => setModalVisualizarShow(true);
+    const hideModalVisualizar = () => setModalVisualizarShow(false);
 
-    const showModalAdicionar = () => setModalAdicionar(true);
-    const hideModalAdicionar = () => setModalAdicionar(false);
+    const showModalAdicionar = () => setModalAdicionarShow(true);
+    const hideModalAdicionar = () => setModalAdicionarShow(false);
 
     const paginateResults = (data, page, resultsPerPage) => {
         const startIndex = (page - 1) * resultsPerPage;
@@ -311,14 +368,20 @@ function ListaVenda() {
         return data.slice(startIndex, endIndex);
     };
 
-    const resultsPerPage = 2;
+    const resultsPerPage = 5;
 
-    const currentResults = catadorData
-        ? paginateResults(catadorData, currentPage, resultsPerPage)
+    const filteredVendas = vendaData
+        ? vendaData.filter((venda) => {
+            const searchString = searchQuery.toLowerCase();
+            const idMatches = venda.id.toString().includes(searchString);
+            const dataVendaMatches = venda.dataVenda.includes(searchString);
+            const empresaCompradoraMatches = venda.empresaCompradora.includes(searchString);
+            return idMatches || dataVendaMatches || empresaCompradoraMatches;
+        })
         : [];
 
-    const totalPages = catadorData
-        ? Math.ceil(catadorData.length / resultsPerPage)
+    const totalPages = vendaData
+        ? Math.ceil(vendaData.length / resultsPerPage)
         : 0;
 
     return (
@@ -337,6 +400,8 @@ function ListaVenda() {
                             placeholder="Pesquisar"
                             aria-label="Pesquisar"
                             aria-describedby="basic-addon2"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                         />
                         <Button type="submit" className="btn-orange" id="button-addon2">
                             <BsSearch className="" /> Buscar
@@ -350,40 +415,54 @@ function ListaVenda() {
                         <BsPlusCircleFill /> Adicionar
                     </Button>
 
-                    <Adicionar show={modalAdicionar} onHide={hideModalAdicionar} />
+                    {/* Componente para adicionar venda */}
+                    <AdicionarVenda
+                        show={modalAdicionarShow}
+                        onHide={hideModalAdicionar}
+                    />
                 </Col>
                 <Col>
                     <h3 className="m-3" style={{ color: "#EF7A2A" }}>
-                        Formularios
+                        Vendas
                     </h3>
                     <ListGroup as="ol" numbered>
-                        <ListGroup.Item
-                            as="li"
-                            className="d-flex justify-content-between align-items-start"
-                        >
-                            <div className="ms-2 me-auto">
-                                <div className="fw-bold">Numero da Coleta</div>
-                                Data da Coleta: 00/00/000 <br />
-                                Quantidade Coletada: 0
-                            </div>
-                            <div>
-                                <Button
-                                    type="submit"
-                                    className="btn-orange"
-                                    onClick={showModalVisualizar}
+                        {paginateResults(filteredVendas, currentPage, resultsPerPage).map(
+                            (venda, index) => (
+                                <ListGroup.Item
+                                    as="li"
+                                    className="d-flex justify-content-between align-items-start"
                                 >
-                                    <BsEyeFill /> Visualizar
-                                </Button>
-                                <Visualizar
-                                    show={modalVisualizar}
-                                    onHide={hideModalVisualizar}
-                                />
-
-                            </div>
-                        </ListGroup.Item>
-
-                     
+                                    <div className="ms-2 me-auto">
+                                        <div className="fw-bold">ID da Venda: {venda.id}</div>
+                                        Data da Venda:{" "}
+                                        {format(new Date(venda.dataVenda), "dd/MM/yyyy")} <br />
+                                        Empresa Compradora: {venda.empresaCompradora}
+                                    </div>
+                                    <div>
+                                        <Button
+                                            type="submit"
+                                            className="btn-orange"
+                                            onClick={() => {
+                                                setVendaSelecionadaId(venda.id);
+                                                showModalVisualizar();
+                                            }}
+                                        >
+                                            <BsEyeFill /> Visualizar
+                                        </Button>
+                                    </div>
+                                </ListGroup.Item>
+                            )
+                        )}
                     </ListGroup>
+
+                    {/* Componente para visualizar venda */}
+                    {vendaSelecionadaId && (
+                        <VisualizarVenda
+                            show={modalVisualizarShow}
+                            onHide={hideModalVisualizar}
+                            idVenda={vendaSelecionadaId}
+                        />
+                    )}
 
                     <Pagination className="pagination-orange mt-3 justify-content-center">
                         <Pagination.Prev
@@ -418,6 +497,6 @@ function ListaVenda() {
             </Row>
         </Container>
     );
-}
+};
 
-export default ListaVenda;
+export default ListarVendas;

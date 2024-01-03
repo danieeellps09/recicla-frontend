@@ -70,8 +70,15 @@ const AdicionarVenda = (props) => {
             empresaCompradora,
             notaFiscal,
             dataVenda,
-            produtos,
+            produtos: produtos.map((produto) => ({
+                idMaterial: produto.idMaterial,
+                quantidade: produto.quantidade,
+            })),
         };
+
+
+
+
 
         const autenticacao = Autenticacao();
         const token = autenticacao.token;
@@ -194,7 +201,7 @@ const AdicionarVenda = (props) => {
                             type="button"
                             className="btn-orange"
                             onClick={handleAddProduto}
-                            style={{ marginTop: "32px" }} 
+                            style={{ marginTop: "32px" }}
                         >
                             Adicionar Produto
                         </Button>
@@ -233,17 +240,33 @@ const VisualizarVenda = (props) => {
     const [dataVenda, setDataVenda] = useState("");
     const [produtos, setProdutos] = useState([]);
     const [venda, setVenda] = useState(null);
-    const [vendaSelecionadaId, setVendaSelecionadaId] = useState(props.idVenda);
+    const [nome, setNome] = useState("");
+
 
     useEffect(() => {
         const fetchData = async (url, setterFunction) => {
             try {
                 const response = await API.get(url);
-                setterFunction(response.data);
-                setEmpresaCompradora(response.data.empresaCompradora);
-                setNotaFiscal(response.data.notaFiscal);
-                setDataVenda(response.data.dataVenda);
-                setProdutos(response.data.materiais);
+
+                if (response.data) {
+                    const vendaData = response.data;
+
+                    if ('dataVenda' in vendaData) {
+                        console.log('Data bruta recebida:', vendaData.dataVenda);
+
+                        setterFunction(vendaData);
+                        setEmpresaCompradora(vendaData.empresaCompradora);
+                        setNotaFiscal(vendaData.notaFiscal);
+
+                        setDataVenda(format(new Date(vendaData.dataVenda), 'dd/MM/yyyy'));
+                        fetchAssociacaoName(response.data.idAssociacao)
+                        setProdutos(vendaData.materiais);
+                    } else {
+                        console.error('A propriedade dataVenda não está presente no objeto:', vendaData);
+                    }
+                } else {
+                    console.error('Resposta vazia ou sem dados:', response.data);
+                }
             } catch (error) {
                 console.error("Erro ao obter dados:", error);
             }
@@ -251,12 +274,39 @@ const VisualizarVenda = (props) => {
         fetchData(`/forms/venda/${props.idVenda}`, setVenda);
     }, [props.idVenda]);
 
+
+    const fetchAssociacaoName = async (idAssociacao) => {
+        try {
+            const response = await API.get(`/associacoes/${idAssociacao}`);
+            setNome(response.data.user.name);
+        } catch (error) {
+            console.error("Erro ao obter o nome do catador:", error);
+        }
+    };
+
+
+
+
     return (
         <Modal {...props} size="lg" centered>
             <Modal.Header closeButton>
                 <Modal.Title style={{ color: "#EF7A2A" }}>Visualizar Venda</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                <Row className="w-100 my-1">
+                    <Form>
+                        <Form.Group>
+                            <Form.Label className="text-orange">Nome do Associacao: </Form.Label>
+                            <Form.Control
+                                type="text"
+                                className="form-control custom-focus"
+                                aria-label="Disabled input example"
+                                value={nome}
+                                disabled
+                            />
+                        </Form.Group>
+                    </Form>
+                </Row>
                 <Row className="w-100 my-1">
                     <Form>
                         <Form.Group>
@@ -291,26 +341,31 @@ const VisualizarVenda = (props) => {
                         <Form.Control
                             type="text"
                             className="form-control custom-focus"
-                            value={format(new Date(dataVenda), "dd/MM/yyyy")}
-                            readOnly
+                            value={dataVenda}
+
                             disabled
                         />
                     </Form>
                 </Row>
 
+
                 <Row className="w-100 my-3">
                     <Form>
                         <Form.Label className="text-orange">Produtos: </Form.Label>
-                        {produtos.map((produto, index) => (
-                            <Form.Control
-                                key={index}
-                                type="text"
-                                className="form-control custom-focus mb-2"
-                                value={`${produto.quantidadeVendida} kg de ${produto.nomeMaterial}`}
-                                disabled
-                                readOnly
-                            />
-                        ))}
+                        {produtos ? (
+                            produtos.map((produto, index) => (
+                                <Form.Control
+                                    key={index}
+                                    type="text"
+                                    className="form-control custom-focus mb-2"
+                                    value={`${produto.quantidadeVendida} kg de ${produto.nomeMaterial}`}
+                                    disabled
+                                    readOnly
+                                />
+                            ))
+                        ) : (
+                            <p>Nenhum produto disponível</p>
+                        )}
                     </Form>
                 </Row>
             </Modal.Body>
@@ -318,7 +373,7 @@ const VisualizarVenda = (props) => {
     );
 };
 
-const ListarVendas = () => {
+const ListarVendasAdm = () => {
     const [vendaData, setVendaData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [vendaSelecionadaId, setVendaSelecionadaId] = useState(null);
@@ -341,7 +396,7 @@ const ListarVendas = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await API.get("/forms/venda/vendas/vendas-by-associacao", config);
+                const response = await API.get("/forms/venda", config);
                 setVendaData(response.data);
                 if (!showSuccessMessage) {
                     toast.success("Vendas listadas com sucesso!");
@@ -407,19 +462,6 @@ const ListarVendas = () => {
                             <BsSearch className="" /> Buscar
                         </Button>
                     </InputGroup>
-                    <Button
-                        type="submit"
-                        className="btn-orange"
-                        onClick={showModalAdicionar}
-                    >
-                        <BsPlusCircleFill /> Adicionar
-                    </Button>
-
-                    {/* Componente para adicionar venda */}
-                    <AdicionarVenda
-                        show={modalAdicionarShow}
-                        onHide={hideModalAdicionar}
-                    />
                 </Col>
                 <Col>
                     <h3 className="m-3" style={{ color: "#EF7A2A" }}>
@@ -499,4 +541,4 @@ const ListarVendas = () => {
     );
 };
 
-export default ListarVendas;
+export default ListarVendasAdm;

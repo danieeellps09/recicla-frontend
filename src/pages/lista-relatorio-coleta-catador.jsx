@@ -79,7 +79,6 @@ function ListaRelatorioColetaCatador() {
     datainicio: formatDate(startDate, "dd/MM/yyyy"),
     datafim: formatDate(endDate, "dd/MM/yyyy"),
   };
-  console.log("Parâmetros da Requisição:", params);
 
   const handleClick = async () => {
     try {

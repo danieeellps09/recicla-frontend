@@ -63,7 +63,6 @@ const AdicionarAssociacao = (props) => {
       bairro: bairro,
       endereco: endereco,
     };
-    console.log(dataToSend);
 
     API.post("/associacoes", dataToSend)
       .then((response) => {
@@ -213,8 +212,7 @@ function EditarAssociacao(props) {
       bairro: bairro,
       endereco: endereco,
     };
-    console.log(dataToSend);
-    console.log(props.associacaoId);
+   
     API.put(`/associacoes/${props.associacaoId}`, dataToSend)
       .then((response) => {
         if (response && response.data) {
@@ -325,7 +323,6 @@ function ListarAssociacoes() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-  console.log(associacaoData);
 
   const handleExcluirAssociacao = (associacaoId) => {
     API.delete(`/associacoes/${associacaoId}`)
@@ -454,22 +451,12 @@ function ListarAssociacoes() {
           md={12}
           className="d-flex align-items-center justify-content-center"
         >
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            ADMINISTRADOR
-          </Button>
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            CATADOR
-          </Button>
+        
           <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
             <BsPeopleFill size={20} className="m-2" />
             ASSOCIAÇÃO
           </Button>
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            OP. LOGÍSTICO
-          </Button>
+     
         </Col>
         <hr className="m-4" />
         <Col

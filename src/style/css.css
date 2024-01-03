@@ -1,4 +1,18 @@
+@media (max-width: 767px) {
+  .login-navbar {
+    padding: 10px;
+  }
 
+  .d-flex-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .d-flex-mobile button {
+    margin-bottom: 10px;
+  }
+}
 
 .login-navbar {
   background: linear-gradient(to bottom, #ef7a2a, #e1621e) !important;
@@ -74,6 +88,8 @@ body .custom-focus:focus {
   border-color: #e1621e !important;
   box-shadow: 0 0 0 0.2rem #ff725e50 !important;
 }
+
+
 
 label,
 .form-check-label,

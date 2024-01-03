@@ -52,7 +52,7 @@ function Login() {
     };
 
     axios
-      .post("https://reciclo.api-reciclo.free.nf/login", data)
+      .post("http://localhost:5000/login", data)
       .then((response) => {
         if (response.status === 200) {
           const { access_token } = response.data;

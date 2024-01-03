@@ -168,8 +168,7 @@ function EditarAdministrador(props) {
         status: true,
       },
     };
-    console.log(dataToSend);
-    console.log(props.administradorId);
+    
     API.put(`/administrador/${props.administradorId}`, dataToSend)
       .then((response) => {
         if (response && response.data) {
@@ -270,7 +269,6 @@ function ListarAdministradores() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-  console.log(administradorData);
 
   const handleExcluirAdministrador = (administradorId) => {
     API.delete(`/administrador/${administradorId}`)

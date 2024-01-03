@@ -90,7 +90,7 @@ function RelatorioColeta() {
 
   const fetchCurrentUser = async () => {
   try {
-    const response = await axios.get("https://reciclo.api-reciclo.free.nf/current_user", config);
+    const response = await axios.get("http://localhost:5000/current_user", config);
     const catadorName = response.data.name ;
 
     return catadorName;
@@ -583,21 +583,7 @@ const fetchAssociacaoName = async (idAssociacao) => {
             />
           </Col>
         </Row>
-        <Row className="w-100 my-1">
-          <Col>
-            <Form.Label className="w-100 text-orange">
-              Rotas totais realizadas em todos os pontos:
-            </Form.Label>
-            <Form.Control
-              type="text"
-              className="form-control custom-focus"
-              style={{ width: "150px" }}
-              value={rotasRealizadas}
-              aria-label="Disabled input exampl"
-              disabled
-            />
-          </Col>
-        </Row>
+       
         <Row className="w-100 my-3">
           <Col>
             <Form.Label className="w-100 text-orange">

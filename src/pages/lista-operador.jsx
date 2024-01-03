@@ -406,18 +406,7 @@ function ListarOperadorLogistico() {
           md={12}
           className="d-flex align-items-center justify-content-center"
         >
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            ADMINISTRADOR
-          </Button>
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            CATADOR
-          </Button>
-          <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
-            <BsPeopleFill size={20} className="m-2" />
-            ASSOCIAÇÃO
-          </Button>
+         
           <Button type="submit" className="rounded-5 btn-orange p-3 mb-2 mx-2">
             <BsPeopleFill size={20} className="m-2" />
             OP. LOGÍSTICO

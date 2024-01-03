@@ -357,10 +357,11 @@ const Visualizar = (props) => {
             </Form.Label>
             <Form.Label className="d-flex align-items-center text-orange">
               <Form.Control
-                type="number"
+                type="text"
                 className="form-control custom-focus"
                 aria-label="Disabled input example"
-                value={quantidade}
+                value={`${quantidade} KG`}
+
                 disabled
               />
             </Form.Label>
@@ -533,7 +534,7 @@ function ListarColetasCatador() {
                     <div className="fw-bold">Numero da Coleta: {coleta.id}</div>
                     Data da Coleta:{" "}
                     {format(new Date(coleta.dataColeta), "dd/MM/yyyy")} <br />
-                    Quantidade Coletada: {coleta.quantidade}
+                    Quantidade Coletada: {coleta.quantidade} KG
                   </div>
                   <div>
                     <Button

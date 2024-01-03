@@ -100,7 +100,6 @@ function ListaRelatorioVendaAssociacao() {
     datainicio: formatDate(startDate, "dd/MM/yyyy"),
     datafim: formatDate(endDate, "dd/MM/yyyy"),
   };
-  console.log("Parâmetros da Requisição:", params);
 
   const handleClick = async () => {
     try {
@@ -113,9 +112,7 @@ function ListaRelatorioVendaAssociacao() {
           },
         }
       );
-      console.log("Após a solicitação com sucesso");
       setVendas(response.data);
-      console.log("venda antes de renderizar RelatorioColeta:", response.data);
       const selectedAssociacaoInfo = associacoes.find(associacao => associacao.id === selectedAssociacao);
 
       navigate("/relatorio-venda-adm", {

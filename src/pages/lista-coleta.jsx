@@ -27,234 +27,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { format } from "date-fns";
 import { API } from "../services/api";
 
-const AdicionarColeta = (props) => {
-  const [rota, setRota] = useState(null);
-  const [quantidade, setQuantidade] = useState(null);
-  const [data, setData] = useState("");
-  const [veiculos, setVeiculos] = useState([]);
-  const [pergunta, setPergunta] = useState(null);
-  const [selectedVeiculo, setSelectedVeiculo] = useState(null);
-  const [selectedPergunta, setSelectedPergunta] = useState(false);
-  const [visualSelectedVeiculo, setVisualSelectedVeiculo] = useState("");
-  const [visualSelectedPergunta, setVisualSelectedPergunta] = useState("");
-  const [motivo, setMotivo] = useState("");
 
-  useEffect(() => {
-    const fetchData = async (url, setterFunction) => {
-      try {
-        const response = await API.get(url);
-        setterFunction(response.data);
-      } catch (error) {
-        console.error("Erro ao obter dados:", error);
-      }
-    };
-
-    fetchData("/veiculos", setVeiculos);
-  }, []);
-
-  const handleVeiculosChange = (event) => {
-    const veiculo = veiculos.find(
-      (v) => v.nomeVeiculo === event.target.innerText
-    );
-    setSelectedVeiculo(veiculo ? veiculo.id : "");
-    setVisualSelectedVeiculo(veiculo ? veiculo.nomeVeiculo : "");
-  };
-
-  const handlePerguntaChange = (selectedOption) => {
-    console.log("selectedOption:", selectedOption);
-
-    const newValue = selectedOption === "Sim";
-    setSelectedPergunta(newValue);
-    setVisualSelectedPergunta(selectedOption);
-
-    if (!newValue) {
-      setMotivo("");
-    }
-  };
-
-  const handleSubmit = () => {
-    console.log("selectedPergunta:", selectedPergunta);
-
-    const dataToSend = {
-      quantidade: quantidade,
-      pergunta: selectedPergunta,
-      motivo: motivo,
-      numRota: rota,
-      idVeiculo: selectedVeiculo,
-      dataColeta: data,
-    };
-    console.log(dataToSend);
-    const autenticacao = Autenticacao();
-    const token = autenticacao.token;
-
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    API.post("/forms/coleta", dataToSend, config)
-      .then((response) => {
-        if (response && response.data) {
-          console.log("Coleta registrada com sucesso:", response.data);
-          setQuantidade("");
-          setPergunta("");
-          setMotivo("");
-          setRota("");
-          setSelectedVeiculo(null);
-          setVisualSelectedVeiculo("");
-          setData("");
-          toast.success("Coleta preenchida criado com sucesso!");
-          props.onHide();
-          window.location.reload();
-        } else {
-          console.error("Resposta inválida ao criar catador:", response);
-          toast.error(
-            "Erro ao preencher coleta. Resposta inválida do servidor."
-          );
-        }
-      })
-
-      .catch((error) => {
-        console.error("Erro ao preencher coleta:", error.response.data);
-        const errorMessage =
-          error.response.data && error.response.data.message
-            ? error.response.data.message
-            : "Erro desconhecido ao preencher coleta.";
-
-        toast.error(`Erro ao preencher coleta: ${errorMessage}`);
-      });
-  };
-
-  return (
-    <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title style={{ color: "#EF7A2A" }}>
-          Adiconar Formulario
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Row className="w-100 my-3">
-          <Col>
-            <Form.Label className="w-100 text-orange">Rota</Form.Label>
-            <Form.Control
-              type="number"
-              className="form-control custom-focus"
-              value={rota}
-              onChange={(e) => setRota(Number(e.target.value))}
-            />
-          </Col>
-          <Col>
-            <Form.Label className="text-orange">
-              Quantidade de residíduos coletados:{" "}
-            </Form.Label>
-            <Form.Label className="d-flex align-items-center text-orange">
-              <Form.Control
-                type="number"
-                className="form-control custom-focus"
-                value={quantidade}
-                onChange={(e) => setQuantidade(Number(e.target.value))}
-              />
-            </Form.Label>
-          </Col>
-        </Row>
-
-        <Row className="w-100 my-3">
-          <Form>
-            <Form.Label className="text-orange">Tipo de Veículo: </Form.Label>
-            <Dropdown className="w-100">
-              <Dropdown.Toggle
-                className="w-100 outline-white"
-                id="dropdown-basic"
-              >
-                {visualSelectedVeiculo || "Selecione um Veículo"}
-              </Dropdown.Toggle>
-              <Dropdown.Menu className="w-100 ">
-                {veiculos.map((veiculo, index) => (
-                  <Dropdown.Item key={index} onClick={handleVeiculosChange}>
-                    {veiculo.nomeVeiculo}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
-          </Form>
-        </Row>
-        <Row className="w-100 my-3">
-          <Form>
-            <Form.Label className="text-orange" placeholder="dia/Mes/Ano">
-              Data da Coleta:{" "}
-            </Form.Label>
-            <InputMask
-              mask="99/99/9999"
-              maskChar="_"
-              value={data}
-              onChange={(e) => setData(e.target.value)}
-            >
-              {() => (
-                <Form.Control
-                  type="text"
-                  className="form-control custom-focus"
-                />
-              )}
-            </InputMask>
-          </Form>
-        </Row>
-        <Row className="w-100 my-3">
-          <Col>
-            <Form.Label className="text-orange">
-              {" "}
-              Todos os pontos foram visitados?{" "}
-            </Form.Label>
-
-            <Dropdown className="w-100">
-              <Dropdown.Toggle
-                className="w-100 outline-white"
-                id="dropdown-basic"
-              >
-                {visualSelectedPergunta || "Selecione aqui"}
-              </Dropdown.Toggle>
-              <Dropdown.Menu className="w-100 ">
-                <Dropdown.Item onClick={() => handlePerguntaChange("Sim")}>
-                  Sim
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => handlePerguntaChange("Não")}>
-                  Não
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </Col>
-        </Row>
-
-        <Row className="w-100 my-3">
-          <Form>
-            <Form.Label className="text-orange"> Motivo </Form.Label>
-            <Form.Control
-              type="text"
-              className="form-control custom-focus"
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-              disabled={pergunta}
-            />
-          </Form>
-        </Row>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          type="submit"
-          className="rounded btn-orange w-100"
-          onClick={handleSubmit}
-        >
-          Enviar
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
 
 const Visualizar = (props) => {
   const [nome, setNome] = useState("");
@@ -267,7 +40,7 @@ const Visualizar = (props) => {
   const [coleta, setColeta] = useState(null);
   const [coletaSelecionadoId, setColetaSelecionadoId] = useState(
     props.idColeta
-  ); 
+  );
 
   useEffect(() => {
     const fetchData = async (url, setterFunction) => {
@@ -287,7 +60,6 @@ const Visualizar = (props) => {
       }
     };
     fetchData(`/forms/coleta/${props.idColeta}`, setColeta);
-    console.log(props.idColeta);
   }, [props.idColeta]);
 
   const fetchCatadorName = async (idCatador) => {
@@ -351,10 +123,10 @@ const Visualizar = (props) => {
             </Form.Label>
             <Form.Label className="d-flex align-items-center text-orange">
               <Form.Control
-                type="number"
+                type="text"
                 className="form-control custom-focus"
                 aria-label="Disabled input example"
-                value={quantidade}
+                value={`${quantidade} KG`}
                 disabled
               />
             </Form.Label>
@@ -409,7 +181,7 @@ const Visualizar = (props) => {
 function ListarColetasCatador() {
   const [coletaData, setColetaData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [coletaSelecionadoId, setColetaSelecionadaId] = useState(null); 
+  const [coletaSelecionadoId, setColetaSelecionadaId] = useState(null);
   const [modalAdicionarShow, setModalAdicionarShow] = useState(false);
   const [modalVisualizarShow, setModalVisualizarShow] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -417,14 +189,14 @@ function ListarColetasCatador() {
 
   const filteredColetas = coletaData
     ? coletaData.filter((coleta) => {
-        const searchString = searchQuery.toLowerCase();
-        const idMatches = coleta.id.toString().includes(searchString);
-        const dataColetaMatches = coleta.dataColeta.includes(searchString);
-        const quantidadeMatches = coleta.quantidade
-          .toString()
-          .includes(searchString);
-        return idMatches || dataColetaMatches || quantidadeMatches;
-      })
+      const searchString = searchQuery.toLowerCase();
+      const idMatches = coleta.id.toString().includes(searchString);
+      const dataColetaMatches = coleta.dataColeta.includes(searchString);
+      const quantidadeMatches = coleta.quantidade
+        .toString()
+        .includes(searchString);
+      return idMatches || dataColetaMatches || quantidadeMatches;
+    })
     : [];
   const autenticacao = Autenticacao();
   const token = autenticacao.token;
@@ -452,14 +224,7 @@ function ListarColetasCatador() {
       });
   }, [searchQuery]);
 
-  const [modalVisualizar, setModalVisualizar] = useState(false);
-  const [modalAdicionar, setModalAdicionar] = useState(false);
 
-  const showModalVisualizar = () => setModalVisualizar(true);
-  const hideModalVisualizar = () => setModalVisualizar(false);
-
-  const showModalAdicionar = () => setModalAdicionar(true);
-  const hideModalAdicionar = () => setModalAdicionar(false);
 
   const paginateResults = (data, page, resultsPerPage) => {
     const startIndex = (page - 1) * resultsPerPage;
@@ -467,7 +232,7 @@ function ListarColetasCatador() {
     return data.slice(startIndex, endIndex);
   };
 
-  const resultsPerPage = 5;
+  const resultsPerPage = 4;
 
   const currentResults = coletaData
     ? paginateResults(coletaData, currentPage, resultsPerPage)
@@ -500,18 +265,9 @@ function ListarColetasCatador() {
               <BsSearch className="" /> Buscar
             </Button>
           </InputGroup>
-          <Button
-            type="submit"
-            className="btn-orange"
-            onClick={() => setModalAdicionarShow(true)}
-          >
-            <BsPlusCircleFill /> Adicionar
-          </Button>
 
-          <AdicionarColeta
-            show={modalAdicionarShow}
-            onHide={() => setModalAdicionarShow(false)}
-          />
+
+
         </Col>
         <Col>
           <h3 className="m-3" style={{ color: "#EF7A2A" }}>
@@ -528,7 +284,7 @@ function ListarColetasCatador() {
                     <div className="fw-bold">Numero da Coleta: {coleta.id}</div>
                     Data da Coleta:{" "}
                     {format(new Date(coleta.dataColeta), "dd/MM/yyyy")} <br />
-                    Quantidade Coletada: {coleta.quantidade}
+                    Quantidade Coletada: {coleta.quantidade} KG
                   </div>
                   <div>
                     <Button

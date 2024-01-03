@@ -17,7 +17,7 @@ function Associacao() {
   };
 
   const linkFormularioVenda = () => {
-    navigate("/lista-venda");
+    navigate("/lista-venda-associacao");
   };
 
   const linkRelatorioVenda = () => {

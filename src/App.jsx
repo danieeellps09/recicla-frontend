@@ -31,6 +31,8 @@ import RedefinirSenha from "./pages/resetar-senha";
 import ListarColetasCatador from "./pages/lista-coleta-catador";
 import RelatorioColetaAdm from "./pages/relatorio-coleta-adm";
 import RelatorioVendaAdm from "./pages/relatorio-venda-adm";
+import ListarVendasAdm from "./pages/lista-venda";
+import ListarVendas from "./pages/lista-venda-associacao";
 
 
 function App() {
@@ -126,11 +128,11 @@ function App() {
               }
             />
             <Route
-              path="/lista-venda"
+              path="/lista-venda-associacao"
               element={
                 <>
                   <Header />
-                  <ListaVenda />
+                  <ListarVendas />
                 </>
               }
             />
@@ -206,7 +208,7 @@ function App() {
             element={
               <>
                 <Header />
-                <ListaVenda />
+                <ListarVendasAdm />
               </>
             }
           />

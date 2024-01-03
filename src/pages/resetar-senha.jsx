@@ -25,7 +25,7 @@ function RedefinirSenha() {
     if (password === confirmPassword) {
       try {
         const response = await axios.post(
-          `https://reciclo.api-reciclo.free.nf/resetar-senha/${token}`,
+          `http://localhost:5000/resetar-senha/${token}`,
           { password: password }
         );
 

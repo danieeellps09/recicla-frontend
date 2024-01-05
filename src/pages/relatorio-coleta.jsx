@@ -90,7 +90,7 @@ function RelatorioColeta() {
 
   const fetchCurrentUser = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/current_user", config);
+    const response = await axios.get("https://reciclo.api-reciclo.free.nf/current_user", config);
     const catadorName = response.data.name ;
 
     return catadorName;
